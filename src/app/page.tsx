@@ -5,8 +5,9 @@ import Draggable from "@/components/dnd/Draggable";
 import Canvas from "@/components/Canvas";
 import { useWorkspaceStore } from "@/providers/workspace-store-provider";
 import { Button } from "@/components/ui/button";
-import ConnectLine from "@/components/ConnectLine";
+import ConnectLine, { CONNECT_MODE } from "@/components/ConnectLine";
 import { Coordinates } from "@dnd-kit/core/dist/types";
+import { getConnectMode } from "@/lib/tools";
 
 const Page = () => {
   const [isItemDragging, setIsItemDragging] = useState(false);
@@ -40,24 +41,18 @@ const Page = () => {
         ))}
         <div className="absolute -z-10 ">
           {lines.map((line) => {
-            let startPoint = {
-              ...nodes.find((node) => node.id === line.startNodeId)
-                ?.coordinates,
-            };
-            let endPoint = {
-              ...nodes.find((node) => node.id === line.endNodeId)?.coordinates,
-            };
-            console.log(startPoint, endPoint);
-            if (!startPoint.x || !endPoint.x) {
+            const [node1, node2] = nodes.filter((node) =>
+              line.NodeIds.includes(node.id)
+            );
+            if (!node1 || !node2) {
               return null;
             }
-            if (startPoint.x > endPoint.x) {
-              startPoint.x -= 140;
-            } else {
-              endPoint.x -= 140;
-            }
+
             return (
-              <ConnectLine key={line.id} start={startPoint} end={endPoint} />
+              <ConnectLine
+                key={line.id}
+                {...getConnectMode(node1.coordinates, node2.coordinates)}
+              />
             );
           })}
         </div>
