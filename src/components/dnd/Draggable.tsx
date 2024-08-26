@@ -20,7 +20,7 @@ function Draggable(props: Props) {
     const { x, y } = props.canvasRef.current.getBoundingClientRect();
     return { x: (-x + 10) / props.scale, y: (-y + 10) / props.scale };
   };
-  const { updateNode, nodes } = useWorkspaceStore((state) => state);
+  const { updateNode } = useWorkspaceStore((state) => state);
   const [position, setPosition] = useState<Coordinates>(startPosition());
   const onDragEnd = (event: DragEndEvent) => {
     if (event.active.id !== props.draggableId) return;

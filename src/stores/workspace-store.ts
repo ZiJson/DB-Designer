@@ -9,6 +9,7 @@ export type WorkspaceState = {
   tables: TableModal[];
   lines: Connection[];
   nodes: FieldNode[];
+  connectingNode: null | number;
 };
 
 export type WorkspaceActions = {
@@ -16,6 +17,8 @@ export type WorkspaceActions = {
   addTable: () => void;
   removeTable: (id: number) => void;
   updateNode: (id: number, coordinates: { x: number; y: number }) => void;
+  setConnectingNode: (id: null | number) => void;
+  addLine: (nodeId1: number, nodeId2: number) => void;
 };
 
 export type WorkspaceStore = WorkspaceState & WorkspaceActions;
@@ -24,47 +27,10 @@ export const defaultInitState: WorkspaceState = {
   canvas: {
     scale: 1,
   },
-  tables: [
-    {
-      id: 1,
-      name: `table ${1}`,
-      fields: [
-        {
-          name: "id",
-          type: { name: "INT" },
-          nullable: false,
-          unique: true,
-        },
-      ],
-    },
-    {
-      id: 2,
-      name: `table ${2}`,
-      fields: [
-        {
-          name: "id",
-          type: { name: "INT" },
-          nullable: false,
-          unique: true,
-        },
-      ],
-    },
-  ],
-  lines: [{ id: 1, NodeIds: [1, 2] }],
-  nodes: [
-    {
-      id: 1,
-      tableId: 1,
-      fieldId: 1,
-      coordinates: { x: 0, y: 0 },
-    },
-    {
-      id: 2,
-      tableId: 2,
-      fieldId: 1,
-      coordinates: { x: 0, y: 0 },
-    },
-  ],
+  tables: [],
+  lines: [],
+  nodes: [],
+  connectingNode: null,
 };
 
 export const createWorkspaceStore = (
@@ -91,11 +57,32 @@ export const createWorkspaceStore = (
             ],
           },
         ],
+        nodes: [
+          ...state.nodes,
+          {
+            id: state.nodes.length + 1,
+            tableId: state.tables.length + 1,
+            fieldId: 1,
+            coordinates: { x: 0, y: 0 },
+          },
+        ],
       })),
-    removeTable: (id: number) =>
-      set((state) => ({
-        tables: state.tables.filter((table) => table.id !== id),
-      })),
+    removeTable: (id: number) => {
+      set((state) => {
+        const nodeIds = state.nodes
+          .filter((node) => node.tableId === id)
+          .map((node) => node.id);
+        console.log(nodeIds);
+        return {
+          tables: state.tables.filter((table) => table.id !== id),
+          lines: state.lines.filter(
+            (line) =>
+              !nodeIds.includes(line.NodeIds[0]) &&
+              !nodeIds.includes(line.NodeIds[1])
+          ),
+        };
+      });
+    },
     updateNode: (id: number, coordinates: { x: number; y: number }) =>
       set((state) => {
         const newNodes = state.nodes.map((node) => {
@@ -106,5 +93,15 @@ export const createWorkspaceStore = (
         });
         return { nodes: newNodes };
       }),
+    setConnectingNode: (id: null | number) => {
+      set((state) => ({ connectingNode: id }));
+    },
+    addLine: (nodeId1: number, nodeId2: number) =>
+      set((state) => ({
+        lines: [
+          ...state.lines,
+          { id: state.lines.length + 1, NodeIds: [nodeId1, nodeId2] },
+        ],
+      })),
   }));
 };

@@ -2,7 +2,6 @@ import { CONNECT_MODE } from "@/components/ConnectLine";
 import { Coordinates } from "@dnd-kit/core/dist/types";
 
 export const getConnectMode = (p1: Coordinates, p2: Coordinates) => {
-  console.log(p1, p2);
   let newP1 = { ...p1 },
     newP2 = { ...p2 };
   const mode =
@@ -21,4 +20,27 @@ export const getConnectMode = (p1: Coordinates, p2: Coordinates) => {
     p2: newP2,
     mode,
   };
+};
+
+export const getCloserPoint = (
+  mousePosition: Coordinates,
+  points: Coordinates[],
+  distance: number = 50
+) => {
+  let minDistance = Infinity;
+  let minIndex = 0;
+  points.forEach((point, index) => {
+    const distance = getDistance(mousePosition, point);
+    if (distance < minDistance) {
+      minDistance = distance;
+      minIndex = index;
+    }
+  });
+  return minDistance < distance ? minIndex : null;
+};
+
+const getDistance = (p1: Coordinates, p2: Coordinates) => {
+  const dx = p1.x - p2.x;
+  const dy = p1.y - p2.y;
+  return Math.sqrt(dx * dx + dy * dy);
 };

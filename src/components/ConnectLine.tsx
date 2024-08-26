@@ -41,6 +41,8 @@ const ConnectLine = ({
         fill: "none",
         stroke: strokeColor,
         strokeWidth,
+        strokeLinecap: "round",
+        strokeDasharray: mode === CONNECT_MODE.STRAIGHT ? "5,10" : "",
       })}
     </Svg>
   );
@@ -49,6 +51,7 @@ const ConnectLine = ({
 export enum CONNECT_MODE {
   SAME_SIDE = 0,
   OPPOSITE_SIDE = 1,
+  STRAIGHT = 2,
 }
 export default ConnectLine;
 
@@ -117,6 +120,18 @@ const getPath: Record<
         width / 2 + radius * Math.sign(deltaX),
         endPoint[1]
       )
+      .L(endPoint[0], endPoint[1]);
+  },
+  [CONNECT_MODE.STRAIGHT]: (start: Coordinates, end: Coordinates) => {
+    const strokeWidth = 4;
+    const deltaX = end.x - start.x;
+    const deltaY = end.y - start.y;
+    const width = Math.max(Math.abs(deltaX), strokeWidth);
+    const height = Math.max(Math.abs(deltaY), strokeWidth);
+    const startPoint = [deltaX < 0 ? width : 0, deltaY < 0 ? height : 0];
+    const endPoint = [deltaX < 0 ? 0 : width, deltaY < 0 ? 0 : height];
+    return new Path()
+      .M(startPoint[0], startPoint[1])
       .L(endPoint[0], endPoint[1]);
   },
 };

@@ -1,6 +1,7 @@
 import React from "react";
 import { X } from "lucide-react";
 import { type TableModal, type Field } from "@/types/Table";
+import { useWorkspaceStore } from "@/providers/workspace-store-provider";
 
 interface Props {
   onRemove: () => void;
@@ -17,21 +18,56 @@ const TableModal = ({ onRemove, tableData }: Props) => {
         {tableData.name}
       </header>
       <div className="">
-        {tableData.fields.map((field) => (
-          <FieldRow key={field.name} field={field} />
+        {tableData.fields.map((field, index) => (
+          <FieldRow
+            key={field.name}
+            field={field}
+            tableId={tableData.id}
+            fieldId={index + 1}
+          />
         ))}
       </div>
     </div>
   );
 };
 
-const FieldRow = ({ field }: { field: Field }) => {
+const FieldRow = ({
+  field,
+  tableId,
+  fieldId,
+}: {
+  field: Field;
+  tableId: number;
+  fieldId: number;
+}) => {
   return (
     <div className="w-full flex justify-between py-1 px-3 relative rounded-b-md">
-      <i className=" absolute bg-slate-100 border-2 border-slate-600 w-3 h-3 rounded-full top-[50%] -right-[7px] translate-y-[-50%] hover:scale-110 hover:bg-slate-300" />
+      <Node tableId={tableId} fieldId={fieldId} />
       <p>{field.name}</p>
       <p className="text-slate-400 ">{field.type.name}</p>
     </div>
+  );
+};
+
+const Node = ({ tableId, fieldId }: { tableId: number; fieldId: number }) => {
+  const setConnectingNode = useWorkspaceStore(
+    (state) => state.setConnectingNode
+  );
+  const { nodes, lines } = useWorkspaceStore((state) => state);
+  const nodeId = nodes.find(
+    (node) => node.tableId === tableId && node.fieldId === fieldId
+  )?.id;
+
+  if (!nodeId) return null;
+
+  return (
+    <i
+      onMouseDown={(e) => {
+        e.stopPropagation();
+        setConnectingNode(nodeId);
+      }}
+      className=" absolute bg-slate-100 border-2 border-slate-600 w-3 h-3 rounded-full top-[50%] -right-[7px] translate-y-[-50%] hover:scale-125 hover:bg-slate-300"
+    />
   );
 };
 
