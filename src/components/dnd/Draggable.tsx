@@ -21,7 +21,16 @@ function Draggable(props: Props) {
     return { x: (-x + 10) / props.scale, y: (-y + 10) / props.scale };
   };
   const { updateNode } = useWorkspaceStore((state) => state);
+  const table = useWorkspaceStore((state) =>
+    state.tables.find((t) => t.id === +props.draggableId),
+  );
   const [position, setPosition] = useState<Coordinates>(startPosition());
+  useEffect(() => {
+    updateNode(+props.draggableId, {
+      x: position.x,
+      y: position.y,
+    });
+  }, [position.x, position.y, props.draggableId, updateNode, table]);
   const onDragEnd = (event: DragEndEvent) => {
     if (event.active.id !== props.draggableId) return;
     const { x, y } = event.delta;
@@ -38,8 +47,8 @@ function Draggable(props: Props) {
     if (event.active.id !== props.draggableId) return;
     const { x, y } = event.delta;
     updateNode(+props.draggableId, {
-      x: position.x + x / props.scale + 144,
-      y: position.y + y / props.scale + 53,
+      x: position.x + x / props.scale,
+      y: position.y + y / props.scale,
     });
   };
   useDndMonitor({ onDragEnd, onDragStart, onDragMove });
@@ -61,22 +70,22 @@ function Draggable(props: Props) {
       }
     : undefined;
   return (
-    <button
+    <div
       onMouseMove={(e) => e.stopPropagation()}
       ref={setNodeRef}
-      className="fixed rounded-xl"
+      className="fixed rounded-xl text-center"
       style={{ ...transformStyle, ...positionStyle }}
       {...listeners}
       {...attributes}
     >
       <div
         className={`transition-all duration-150 ease-in-out ${
-          isDragging ? "scale-[1.06] shadow-xl cursor-grabbing" : "scale-100"
+          isDragging ? "scale-[1.06] cursor-grabbing shadow-xl" : "scale-100"
         }`}
       >
         {props.children}
       </div>
-    </button>
+    </div>
   );
 }
 

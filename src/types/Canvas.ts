@@ -1,3 +1,3 @@
 export type CanvasState = {
-    scale: number;
+  scale: number;
 };

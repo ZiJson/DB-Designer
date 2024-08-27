@@ -1,29 +1,61 @@
 export type BasicType = {
-    name: string;
+  name: string;
 };
-
-export type INT = {
-    name: "INT";
-} & BasicType;
-
-export type FLOAT = {
-    name: "FLOAT";
+export type STRING = {
+  name: FieldTypes.STRING;
 } & BasicType;
 
 export type BOOLEAN = {
-    name: "BOOLEAN";
+  name: FieldTypes.BOOLEAN;
 } & BasicType;
 
-export type TEXT = {
-    name: "TEXT";
+export type INT = {
+  name: FieldTypes.INT;
 } & BasicType;
 
-export type DATE = {
-    name: "DATE";
+export type BIGINT = {
+  name: FieldTypes.BIGINT;
 } & BasicType;
 
-export type UUID = {
-    name: "UUID";
+export type FLOAT = {
+  name: FieldTypes.FLOAT;
 } & BasicType;
 
-export type FiledTypes = INT | FLOAT | BOOLEAN | TEXT | DATE | UUID;
+export type DECIMAL = {
+  name: FieldTypes.DECIMAL;
+} & BasicType;
+
+export type DATETIME = {
+  name: FieldTypes.DATETIME;
+} & BasicType;
+
+export type JSON = {
+  name: FieldTypes.JSON;
+} & BasicType;
+
+export type BYTES = {
+  name: FieldTypes.BYTES;
+} & BasicType;
+
+export type FiledTypes =
+  | STRING
+  | BOOLEAN
+  | INT
+  | BIGINT
+  | FLOAT
+  | DECIMAL
+  | DATETIME
+  | JSON
+  | BYTES;
+
+export enum FieldTypes {
+  STRING = "String",
+  BOOLEAN = "Boolean",
+  INT = "Int",
+  BIGINT = "BigInt",
+  FLOAT = "Float",
+  DECIMAL = "Decimal",
+  DATETIME = "DateTime",
+  JSON = "Json",
+  BYTES = "Bytes",
+}
