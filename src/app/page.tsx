@@ -1,65 +1,18 @@
 "use client";
-import React, { useEffect, useState, useRef } from "react";
-import TableModal from "../components/TableModal";
-import Draggable from "@/components/dnd/Draggable";
-import Canvas from "@/components/Canvas";
 import { useWorkspaceStore } from "@/providers/workspace-store-provider";
 import { Button } from "@/components/ui/button";
-import ConnectLine, { CONNECT_MODE } from "@/components/ConnectLine";
-import { Coordinates } from "@dnd-kit/core/dist/types";
-import { getConnectMode } from "@/lib/tools";
+import DashBoard from "@/components/DashBoard";
+import DrawingBoard from "@/components/DrawingBoard";
 
 const Page = () => {
-  const [isItemDragging, setIsItemDragging] = useState(false);
-  const canvasRef = useRef<HTMLDivElement>(null);
-
-  const {
-    tables,
-    addTable,
-    removeTable,
-    nodes,
-    lines,
-    canvas: { scale: canvasScale },
-  } = useWorkspaceStore((state) => state);
-
+  const addTable = useWorkspaceStore((state) => state.addTable);
   return (
     <div>
-      <Canvas isItemDragging={isItemDragging} canvasRef={canvasRef}>
-        {tables.map((table) => (
-          <Draggable
-            key={table.id}
-            draggableId={table.id.toString()}
-            scale={canvasScale}
-            setIsItemDragging={setIsItemDragging}
-            canvasRef={canvasRef}
-          >
-            <TableModal
-              onRemove={() => removeTable(table.id)}
-              tableData={table}
-            />
-          </Draggable>
-        ))}
-        <div className="absolute -z-10 ">
-          {lines.map((line) => {
-            const [node1, node2] = nodes.filter((node) =>
-              line.NodeIds.includes(node.id)
-            );
-            if (!node1 || !node2) {
-              return null;
-            }
-
-            return (
-              <ConnectLine
-                key={line.id}
-                {...getConnectMode(node1.coordinates, node2.coordinates)}
-              />
-            );
-          })}
-        </div>
-      </Canvas>
+      <DrawingBoard />
+      <DashBoard />
       <Button
         onClick={addTable}
-        className="absolute top-5 right-[50%] translate-x-[50%]"
+        className="absolute right-[50%] top-5 translate-x-[50%]"
       >
         New Table
       </Button>

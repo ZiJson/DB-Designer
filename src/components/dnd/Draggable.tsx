@@ -71,7 +71,9 @@ function Draggable(props: Props) {
     : undefined;
   return (
     <div
-      onMouseMove={(e) => e.stopPropagation()}
+      onMouseMove={(e) => {
+        e.stopPropagation();
+      }}
       ref={setNodeRef}
       className="fixed rounded-xl text-center"
       style={{ ...transformStyle, ...positionStyle }}

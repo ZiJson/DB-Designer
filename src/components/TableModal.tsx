@@ -45,7 +45,7 @@ const FieldRow = ({
     <div className="relative flex w-full justify-between rounded-b-md px-3 py-1">
       <Node tableId={tableId} fieldId={fieldId} />
       <p>{field.name}</p>
-      <p className="text-slate-400">{field.type.name}</p>
+      <p className="text-slate-400">{field.type}</p>
     </div>
   );
 };

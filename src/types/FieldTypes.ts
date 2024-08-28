@@ -1,41 +1,38 @@
-export type BasicType = {
-  name: string;
-};
 export type STRING = {
-  name: FieldTypes.STRING;
-} & BasicType;
+  type: FieldTypes.STRING;
+};
 
 export type BOOLEAN = {
-  name: FieldTypes.BOOLEAN;
-} & BasicType;
+  type: FieldTypes.BOOLEAN;
+};
 
 export type INT = {
-  name: FieldTypes.INT;
-} & BasicType;
+  type: FieldTypes.INT;
+};
 
 export type BIGINT = {
-  name: FieldTypes.BIGINT;
-} & BasicType;
+  type: FieldTypes.BIGINT;
+};
 
 export type FLOAT = {
-  name: FieldTypes.FLOAT;
-} & BasicType;
+  type: FieldTypes.FLOAT;
+};
 
 export type DECIMAL = {
-  name: FieldTypes.DECIMAL;
-} & BasicType;
+  type: FieldTypes.DECIMAL;
+};
 
 export type DATETIME = {
-  name: FieldTypes.DATETIME;
-} & BasicType;
+  type: FieldTypes.DATETIME;
+};
 
 export type JSON = {
-  name: FieldTypes.JSON;
-} & BasicType;
+  type: FieldTypes.JSON;
+};
 
 export type BYTES = {
-  name: FieldTypes.BYTES;
-} & BasicType;
+  type: FieldTypes.BYTES;
+};
 
 export type FiledTypes =
   | STRING

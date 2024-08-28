@@ -1,12 +1,6 @@
 "use client";
 import React, { useState, useRef } from "react";
-import {
-  DndContext,
-  useSensors,
-  useSensor,
-  PointerSensor,
-  MouseSensor,
-} from "@dnd-kit/core";
+import { DndContext, useSensors, useSensor, MouseSensor } from "@dnd-kit/core";
 import { useWorkspaceStore } from "@/providers/workspace-store-provider";
 import ConnectingLine from "./ConnectingLine";
 
@@ -26,7 +20,7 @@ const Canvas = ({ children, isItemDragging, canvasRef }: Props) => {
   const [mouseStart, setMouseStart] = useState<null | Position>(null);
 
   const { scaling, canvas, connectingNode } = useWorkspaceStore(
-    (state) => state
+    (state) => state,
   );
 
   const onMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -89,7 +83,7 @@ const Canvas = ({ children, isItemDragging, canvasRef }: Props) => {
   const sensors = useSensors(
     useSensor(MouseSensor, {
       activationConstraint: { delay: 200, tolerance: 100, distance: 8 },
-    })
+    }),
   );
   return (
     <DndContext sensors={sensors}>
@@ -98,7 +92,7 @@ const Canvas = ({ children, isItemDragging, canvasRef }: Props) => {
         onMouseDown={onMouseDown}
         onMouseMove={onMouseMove}
         onMouseUp={onMouseUp}
-        className="absolute overflow-hidden inset-0 h-full w-full bg-white bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:20px_20px] "
+        className="absolute inset-0 h-full w-full overflow-hidden bg-white bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:20px_20px]"
       >
         <div
           ref={canvasRef}
@@ -108,7 +102,7 @@ const Canvas = ({ children, isItemDragging, canvasRef }: Props) => {
             ...canvasTranslateStyle,
             ...canvasScaleStyle,
           }}
-          className="fixed w-8 h-8 border-solid border-4 border-r-0 border-b-0 border-slate-600"
+          className="fixed h-8 w-8 border-4 border-b-0 border-r-0 border-solid border-slate-600"
         >
           {children}
           {connectingNode && <ConnectingLine canvasRef={canvasRef} />}

@@ -16,7 +16,7 @@ const ConnectingLine = ({ canvasRef }: Props) => {
   const setIsConnecting = useWorkspaceStore((state) => state.setConnectingNode);
   const connectingNode = useWorkspaceStore((state) => state.connectingNode);
   const fixedPoints: Coordinates = nodes.find(
-    (node) => node.id === connectingNode
+    (node) => node.id === connectingNode,
   )?.coordinates || { x: 0, y: 0 };
   const [mousePosition, setMousePosition] = useState<Coordinates>(fixedPoints);
   const otherNodes = nodes.filter((node) => node.id !== connectingNode);
@@ -30,21 +30,28 @@ const ConnectingLine = ({ canvasRef }: Props) => {
       const closestPointIndex = getCloserPoint(
         { x: mouseX, y: mouseY },
         otherNodes.map((node) => node.coordinates),
-        20
+        20,
       );
 
       setMousePosition(
         closestPointIndex !== null
           ? otherNodes[closestPointIndex].coordinates
-          : { x: mouseX, y: mouseY }
+          : { x: mouseX, y: mouseY },
       );
 
       connectedNodeIdRef.current =
         closestPointIndex !== null ? otherNodes[closestPointIndex].id : null;
     };
-    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mousemove", handleMouseMove, { capture: true });
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [canvasRef, canvasScale, otherNodes, nodes]);
+
+  useEffect(() => {
+    document.body.style.cursor = "grabbing";
+    return () => {
+      document.body.style.cursor = "default";
+    };
+  }, [connectingNode]);
 
   const onMouseUp = () => {
     setIsConnecting(null);
@@ -62,7 +69,7 @@ const ConnectingLine = ({ canvasRef }: Props) => {
         mode={CONNECT_MODE.STRAIGHT}
       />
       <i
-        className=" absolute  border-2 border-slate-600 w-3 h-3 rounded-full  translate-y-[-50%] translate-x-[-50%] bg-slate-300"
+        className="absolute h-3 w-3 translate-x-[-50%] translate-y-[-50%] rounded-full border-2 border-slate-600 bg-slate-300"
         style={{ left: mousePosition.x - 1, top: mousePosition.y - 1 }}
       />
     </div>

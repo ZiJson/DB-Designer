@@ -1,6 +1,5 @@
 "use client";
 import { Coordinates } from "@dnd-kit/core/dist/types";
-import prototypes from "prop-types";
 import Path, { Svg } from "react-svg-path";
 
 interface Props {
@@ -78,17 +77,17 @@ const getPath: Record<
         endPoint[0] + minLength,
         startPoint[1],
         endPoint[0] + minLength,
-        startPoint[1] + radius * Math.sign(deltaX * deltaY)
+        startPoint[1] + radius * Math.sign(deltaX * deltaY),
       )
       .L(
         endPoint[0] + minLength,
-        endPoint[1] - radius * Math.sign(deltaX * deltaY)
+        endPoint[1] - radius * Math.sign(deltaX * deltaY),
       )
       .Q(
         endPoint[0] + minLength,
         endPoint[1],
         endPoint[0] + minLength - radius,
-        endPoint[1]
+        endPoint[1],
       )
       .L(endPoint[0], endPoint[1]);
   },
@@ -111,14 +110,14 @@ const getPath: Record<
         width / 2,
         startPoint[1],
         width / 2,
-        startPoint[1] + radius * Math.sign(deltaY)
+        startPoint[1] + radius * Math.sign(deltaY),
       )
       .L(width / 2, endPoint[1] - radius * Math.sign(deltaY))
       .Q(
         width / 2,
         endPoint[1],
         width / 2 + radius * Math.sign(deltaX),
-        endPoint[1]
+        endPoint[1],
       )
       .L(endPoint[0], endPoint[1]);
   },

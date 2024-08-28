@@ -1,4 +1,4 @@
-import { CONNECT_MODE } from "@/components/ConnectLine";
+import { CONNECT_MODE } from "@/components/DrawingBoard/ConnectLine";
 import { Coordinates } from "@dnd-kit/core/dist/types";
 
 export const getConnectMode = (p1: Coordinates, p2: Coordinates) => {
@@ -25,7 +25,7 @@ export const getConnectMode = (p1: Coordinates, p2: Coordinates) => {
 export const getCloserPoint = (
   mousePosition: Coordinates,
   points: Coordinates[],
-  distance: number = 50
+  distance: number = 50,
 ) => {
   let minDistance = Infinity;
   let minIndex = 0;

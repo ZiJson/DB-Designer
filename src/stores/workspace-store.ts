@@ -1,5 +1,5 @@
 import { createStore } from "zustand/vanilla";
-import { type TableModal } from "@/types/Table";
+import { Field, type TableModal } from "@/types/Table";
 import { type Connection, type FieldNode } from "@/types/Connection";
 import { type CanvasState } from "@/types/Canvas";
 import { FieldTypes } from "@/types/FieldTypes";
@@ -16,6 +16,7 @@ export type WorkspaceState = {
 export type WorkspaceActions = {
   scaling: (scale: number) => void;
   addTable: () => void;
+  updateTable: (table: TableModal) => void;
   removeTable: (id: number) => void;
   updateNode: (id: number, coordinates: { x: number; y: number }) => void;
   setConnectingNode: (id: null | number) => void;
@@ -37,6 +38,16 @@ export const defaultInitState: WorkspaceState = {
   connectingNode: null,
 };
 
+const defaultField: Field = {
+  name: "",
+  type: FieldTypes.INT,
+  nullable: false,
+  unique: false,
+  isArray: false,
+  isPrimaryKey: false,
+  default: null,
+};
+
 export const createWorkspaceStore = (
   initState: WorkspaceState = defaultInitState,
 ) => {
@@ -55,10 +66,8 @@ export const createWorkspaceStore = (
               name: `table ${state.tables.length + 1}`,
               fields: [
                 {
+                  ...defaultField,
                   name: "id",
-                  type: { name: FieldTypes.INT },
-                  nullable: false,
-                  unique: true,
                 },
               ],
             },
@@ -140,10 +149,9 @@ export const createWorkspaceStore = (
               fields: [
                 ...table.fields,
                 {
-                  name: name,
-                  type: { name: fieldType },
-                  nullable: false,
-                  unique: false,
+                  ...defaultField,
+                  name,
+                  type: fieldType,
                 },
               ],
             };
@@ -151,5 +159,15 @@ export const createWorkspaceStore = (
           return table;
         }),
       })),
+    updateTable: (table: TableModal) => {
+      set((state) => ({
+        tables: state.tables.map((t) => {
+          if (t.id === table.id) {
+            return table;
+          }
+          return t;
+        }),
+      }));
+    },
   }));
 };
