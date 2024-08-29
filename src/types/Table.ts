@@ -8,9 +8,17 @@ export type TableModal = {
 
 export type Field = {
   name: string;
-  isPrimaryKey: boolean;
-  nullable: boolean;
-  unique: boolean;
-  isArray: boolean;
-  default: string | null;
-} & FiledTypes;
+  defaultValue: string | null;
+} & FiledTypes &
+  FieldToggle;
+
+export type FieldToggle = {
+  [K in ToggleType]: boolean;
+};
+
+export enum ToggleType {
+  PrimaryKey = "primaryKey",
+  Nullable = "nullable",
+  Unique = "unique",
+  Array = "toArray",
+}

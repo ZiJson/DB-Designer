@@ -12,7 +12,6 @@ const DrawingBoard = () => {
 
   const {
     tables,
-    addTable,
     removeTable,
     nodes,
     lines,

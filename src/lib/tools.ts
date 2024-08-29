@@ -44,3 +44,7 @@ const getDistance = (p1: Coordinates, p2: Coordinates) => {
   const dy = p1.y - p2.y;
   return Math.sqrt(dx * dx + dy * dy);
 };
+
+export const getToggleValue = (group: { [key: string]: boolean }) => {
+  return Object.keys(group).filter((key) => group[key]);
+};

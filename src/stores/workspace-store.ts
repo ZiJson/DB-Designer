@@ -1,5 +1,5 @@
 import { createStore } from "zustand/vanilla";
-import { Field, type TableModal } from "@/types/Table";
+import { Field, ToggleType, type TableModal } from "@/types/Table";
 import { type Connection, type FieldNode } from "@/types/Connection";
 import { type CanvasState } from "@/types/Canvas";
 import { FieldTypes } from "@/types/FieldTypes";
@@ -11,6 +11,7 @@ export type WorkspaceState = {
   lines: Connection[];
   nodes: FieldNode[];
   connectingNode: null | number;
+  isDashboardOpen: boolean;
 };
 
 export type WorkspaceActions = {
@@ -24,6 +25,7 @@ export type WorkspaceActions = {
   addField: (tableId: number, name: string, fieldType: FieldTypes) => void;
   addNode: (tableId: number, fieldId: number) => void;
   getNodesByTableId: (tableId: number) => FieldNode[];
+  setIsDashboardOpen: (isDashboardOpen: boolean) => void;
 };
 
 export type WorkspaceStore = WorkspaceState & WorkspaceActions;
@@ -36,16 +38,17 @@ export const defaultInitState: WorkspaceState = {
   lines: [],
   nodes: [],
   connectingNode: null,
+  isDashboardOpen: false,
 };
 
 const defaultField: Field = {
   name: "",
   type: FieldTypes.INT,
-  nullable: false,
-  unique: false,
-  isArray: false,
-  isPrimaryKey: false,
-  default: null,
+  [ToggleType.Nullable]: false,
+  [ToggleType.Unique]: false,
+  [ToggleType.Array]: false,
+  [ToggleType.PrimaryKey]: false,
+  defaultValue: null,
 };
 
 export const createWorkspaceStore = (
@@ -169,5 +172,7 @@ export const createWorkspaceStore = (
         }),
       }));
     },
+    setIsDashboardOpen: (isDashboardOpen: boolean) =>
+      set((state) => ({ isDashboardOpen })),
   }));
 };
