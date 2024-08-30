@@ -23,6 +23,7 @@ import { Label } from "@/components/ui/label";
 import { PropsWithChildren, useState } from "react";
 import { FieldTypes } from "@/types/FieldTypes";
 import { useWorkspaceStore } from "@/providers/workspace-store-provider";
+import { ArrowLeftRight } from "lucide-react";
 
 interface AddFieldProps extends PropsWithChildren {
   tableId: number;
@@ -34,7 +35,6 @@ const AddField = ({ children, tableId }: AddFieldProps) => {
   const [type, setType] = useState<FieldTypes | null>(null);
 
   const onSubmit = () => {
-    console.log(name, type);
     if (!name || !type) return;
     addField(tableId, name, type);
     setName("");
@@ -42,8 +42,8 @@ const AddField = ({ children, tableId }: AddFieldProps) => {
   };
   return (
     <Sheet>
-      <SheetTrigger>{children}</SheetTrigger>
-      <SheetContent side="left">
+      <SheetTrigger asChild>{children}</SheetTrigger>
+      <SheetContent side="right">
         <SheetHeader>
           <SheetTitle>Please Enter Some Info to Add a Field</SheetTitle>
           <SheetDescription>
@@ -52,19 +52,26 @@ const AddField = ({ children, tableId }: AddFieldProps) => {
           </SheetDescription>
         </SheetHeader>
         <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-right">
+          <div className="grid grid-cols-8 items-center gap-4">
+            <Label htmlFor="name" className="col-span-2 text-right">
               Name
             </Label>
             <Input
               id="name"
               value={name}
-              className="col-span-3"
+              className="col-span-6"
               onChange={(e) => setName(e.target.value)}
               required
             />
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
+          <div className="grid grid-cols-8 items-center gap-4">
+            <Button
+              size="icon"
+              className="col-span-1 h-8 w-8 p-2"
+              variant="ghost"
+            >
+              <ArrowLeftRight />
+            </Button>
             <Label htmlFor="type" className="text-right">
               Type
             </Label>
@@ -72,7 +79,7 @@ const AddField = ({ children, tableId }: AddFieldProps) => {
               value={type as string}
               onValueChange={(t) => setType(t as FieldTypes)}
             >
-              <SelectTrigger id="type" className="col-span-3">
+              <SelectTrigger id="type" className="col-span-6">
                 <SelectValue placeholder="Select a Type" />
               </SelectTrigger>
               <SelectContent>

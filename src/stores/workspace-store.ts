@@ -3,7 +3,9 @@ import { Field, ToggleType, type TableModal } from "@/types/Table";
 import { type Connection, type FieldNode } from "@/types/Connection";
 import { type CanvasState } from "@/types/Canvas";
 import { FieldTypes } from "@/types/FieldTypes";
-import { toast } from "sonner";
+import { createSettingActions, WorkspaceSettingActions } from "./actions/set";
+import { createGettingActions, WorkspaceGettingActions } from "./actions/get";
+import { createToolActions, WorkspaceToolActions } from "./actions/tool";
 
 export type WorkspaceState = {
   canvas: CanvasState;
@@ -28,7 +30,10 @@ export type WorkspaceActions = {
   setIsDashboardOpen: (isDashboardOpen: boolean) => void;
 };
 
-export type WorkspaceStore = WorkspaceState & WorkspaceActions;
+export type WorkspaceStore = WorkspaceState &
+  WorkspaceSettingActions &
+  WorkspaceGettingActions &
+  WorkspaceToolActions;
 
 export const defaultInitState: WorkspaceState = {
   canvas: {
@@ -41,7 +46,8 @@ export const defaultInitState: WorkspaceState = {
   isDashboardOpen: false,
 };
 
-const defaultField: Field = {
+export const defaultField: Field = {
+  id: 1,
   name: "",
   type: FieldTypes.INT,
   [ToggleType.Nullable]: false,
@@ -54,125 +60,10 @@ const defaultField: Field = {
 export const createWorkspaceStore = (
   initState: WorkspaceState = defaultInitState,
 ) => {
-  return createStore<WorkspaceStore>()((set, get) => ({
+  return createStore<WorkspaceStore>()((...args) => ({
     ...initState,
-    scaling: (scale: number) =>
-      set((state) => ({ ...state, canvas: { scale } })),
-    addTable: () =>
-      set((state) => {
-        state.addNode(state.tables.length + 1, 1);
-        return {
-          tables: [
-            ...state.tables,
-            {
-              id: state.tables.length + 1,
-              name: `table ${state.tables.length + 1}`,
-              fields: [
-                {
-                  ...defaultField,
-                  name: "id",
-                },
-              ],
-            },
-          ],
-        };
-      }),
-    removeTable: (id: number) => {
-      set((state) => {
-        const nodeIds = state.nodes
-          .filter((node) => node.tableId === id)
-          .map((node) => node.id);
-        console.log(nodeIds);
-        return {
-          tables: state.tables.filter((table) => table.id !== id),
-          lines: state.lines.filter(
-            (line) =>
-              !nodeIds.includes(line.NodeIds[0]) &&
-              !nodeIds.includes(line.NodeIds[1]),
-          ),
-        };
-      });
-    },
-    getNodesByTableId: (tableId: number) => {
-      return get().nodes.filter((node) => node.tableId === tableId);
-    },
-    updateNode: (id: number, tableCoordinates: { x: number; y: number }) => {
-      const nodes = get().getNodesByTableId(id);
-      const nodeIds = nodes.map((node) => node.id);
-      set((state) => {
-        const newNodes = state.nodes.map((node, index) => {
-          if (nodeIds.includes(node.id)) {
-            const curNode = nodes.find((n) => n.id === node.id)!;
-            const newCoordinates = {
-              x: tableCoordinates.x + 144,
-              y: tableCoordinates.y + 53 + (curNode.fieldId - 1) * 33,
-            };
-            return { ...node, coordinates: newCoordinates };
-          }
-          return node;
-        });
-        return { nodes: newNodes };
-      });
-    },
-    setConnectingNode: (id: null | number) => {
-      set((state) => ({ connectingNode: id }));
-    },
-    addLine: (nodeId1: number, nodeId2: number) => {
-      const tableId1 = get().nodes.find((node) => node.id === nodeId1)!.tableId;
-      const tableId2 = get().nodes.find((node) => node.id === nodeId2)!.tableId;
-      if (tableId1 === tableId2)
-        return toast.error("Cannot connect fields from the same table");
-      set((state) => ({
-        lines: [
-          ...state.lines,
-          { id: state.lines.length + 1, NodeIds: [nodeId1, nodeId2] },
-        ],
-      }));
-    },
-    addNode: (tableId: number, fieldId: number) => {
-      set((state) => ({
-        nodes: [
-          ...state.nodes,
-          {
-            id: state.nodes.length + 1,
-            tableId,
-            fieldId,
-            coordinates: { x: 0, y: 0 },
-          },
-        ],
-      }));
-    },
-    addField: (tableId: number, name: string, fieldType: FieldTypes) =>
-      set((state) => ({
-        tables: state.tables.map((table) => {
-          if (table.id === tableId) {
-            state.addNode(tableId, table.fields.length + 1);
-            return {
-              ...table,
-              fields: [
-                ...table.fields,
-                {
-                  ...defaultField,
-                  name,
-                  type: fieldType,
-                },
-              ],
-            };
-          }
-          return table;
-        }),
-      })),
-    updateTable: (table: TableModal) => {
-      set((state) => ({
-        tables: state.tables.map((t) => {
-          if (t.id === table.id) {
-            return table;
-          }
-          return t;
-        }),
-      }));
-    },
-    setIsDashboardOpen: (isDashboardOpen: boolean) =>
-      set((state) => ({ isDashboardOpen })),
+    ...createSettingActions(...args),
+    ...createGettingActions(...args),
+    ...createToolActions(...args),
   }));
 };

@@ -7,6 +7,7 @@ export type TableModal = {
 };
 
 export type Field = {
+  id: number;
   name: string;
   defaultValue: string | null;
 } & FiledTypes &

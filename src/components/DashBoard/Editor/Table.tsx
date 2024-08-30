@@ -27,11 +27,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FieldTypes } from "@/types/FieldTypes";
 import { useWorkspaceStore } from "@/providers/workspace-store-provider";
-import { useEffect, useState } from "react";
-import { Check, Key } from "lucide-react";
-import { get } from "http";
-import { getToggleValue } from "@/lib/tools";
+import { FormEvent, useEffect, useState } from "react";
+import { Check, ListPlus, Pencil } from "lucide-react";
 import ToggleIcon from "./ToggleIcon";
+import * as Sheet from "../../Sheets";
+import { Button } from "@/components/ui/button";
 
 interface Props {
   table: TableModal;
@@ -39,6 +39,7 @@ interface Props {
 const Table = ({ table }: Props) => {
   const updateTable = useWorkspaceStore((state) => state.updateTable);
   const [names, setNames] = useState<string[]>([]);
+  const [tableName, setTableName] = useState<string | null>(null);
 
   useEffect(() => {
     setNames(table.fields.map((field) => field.name));
@@ -71,6 +72,14 @@ const Table = ({ table }: Props) => {
       }),
     );
   };
+  const onUpdateTableName = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    updateTable({
+      ...table,
+      name: tableName,
+    });
+    setTableName(null);
+  };
 
   const onValueChange =
     (fieldKey: string, fieldIndex: number) => (value: string | boolean) => {
@@ -80,11 +89,39 @@ const Table = ({ table }: Props) => {
   return (
     <Card className="shadow-md">
       <CardHeader>
-        <CardTitle>{table.name}</CardTitle>
+        <CardTitle className="flex items-center">
+          {tableName ? (
+            <form onSubmit={onUpdateTableName} className="group relative">
+              <Input
+                className="w-fit"
+                defaultValue={table.name!}
+                onChange={(e) => setTableName(e.target.value)}
+              />
+              <button
+                type="submit"
+                className="absolute right-2 top-[50%] hidden translate-y-[-50%] group-focus-within:block"
+              >
+                <Check className="rounded-full p-1 hover:bg-slate-200" />
+              </button>
+            </form>
+          ) : (
+            <>
+              <p>{table.name}</p>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="ml-1"
+                onClick={() => !tableName && setTableName(table.name)}
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+            </>
+          )}
+        </CardTitle>
       </CardHeader>
       <CardContent className="grid gap-2">
         {table.fields.map(
-          ({ name, type, defaultValue, ...toggleRest }, fieldIndex) => (
+          ({ id, name, type, defaultValue, ...toggleRest }, fieldIndex) => (
             <div key={name} className="grid grid-cols-3 gap-2">
               <div className="col-span-2 grid w-full max-w-sm items-center gap-1.5">
                 <form
@@ -138,7 +175,7 @@ const Table = ({ table }: Props) => {
                   .reverse()
                   .map((item) => (
                     <TooltipProvider key={item}>
-                      <Tooltip>
+                      <Tooltip delayDuration={300}>
                         <TooltipTrigger asChild>
                           <div>
                             <Toggle
@@ -164,6 +201,12 @@ const Table = ({ table }: Props) => {
             </div>
           ),
         )}
+        <Sheet.AddField tableId={table.id}>
+          <Button className="w-full p-0">
+            <ListPlus />
+            Add
+          </Button>
+        </Sheet.AddField>
       </CardContent>
     </Card>
   );
