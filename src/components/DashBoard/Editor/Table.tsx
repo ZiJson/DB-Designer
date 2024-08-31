@@ -27,7 +27,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FieldTypes } from "@/types/FieldTypes";
 import { useWorkspaceStore } from "@/providers/workspace-store-provider";
-import { FormEvent, useEffect, useState } from "react";
+import { FocusEvent, FormEvent, useEffect, useState } from "react";
 import { Check, ListPlus, Pencil } from "lucide-react";
 import ToggleIcon from "./ToggleIcon";
 import * as Sheet from "../../Sheets";
@@ -72,7 +72,9 @@ const Table = ({ table }: Props) => {
       }),
     );
   };
-  const onUpdateTableName = (e: FormEvent<HTMLFormElement>) => {
+  const onUpdateTableName = (
+    e: FormEvent<HTMLFormElement> | FocusEvent<HTMLInputElement>,
+  ) => {
     e.preventDefault();
     updateTable({
       ...table,
@@ -96,6 +98,7 @@ const Table = ({ table }: Props) => {
                 className="w-fit"
                 defaultValue={table.name!}
                 onChange={(e) => setTableName(e.target.value)}
+                onBlur={onUpdateTableName}
               />
               <button
                 type="submit"
@@ -127,7 +130,6 @@ const Table = ({ table }: Props) => {
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
-                    console.log(names);
                     onUpdateTable("name", fieldIndex, names[fieldIndex]);
                   }}
                   className="group relative"
@@ -138,6 +140,10 @@ const Table = ({ table }: Props) => {
                     id={`name-${table.id}-${fieldIndex}`}
                     defaultValue={name}
                     onChange={onChange}
+                    onBlur={(e) => {
+                      e.preventDefault();
+                      onUpdateTable("name", fieldIndex, names[fieldIndex]);
+                    }}
                     name={`name-${table.id}-${fieldIndex}`}
                   />
                   <button
