@@ -48,3 +48,10 @@ const getDistance = (p1: Coordinates, p2: Coordinates) => {
 export const getToggleValue = (group: { [key: string]: boolean }) => {
   return Object.keys(group).filter((key) => group[key]);
 };
+
+export const insertAt = <T>(array: T[], index: number, item: T): T[] => {
+  if (index < 0 || index > array.length) {
+    throw new Error("Index out of bounds");
+  }
+  return [...array.slice(0, index), item, ...array.slice(index)];
+};

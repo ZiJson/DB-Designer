@@ -12,10 +12,12 @@ type Position = {
 interface Props {
   children: React.ReactNode;
   isItemDragging: boolean;
-  canvasRef: React.RefObject<HTMLDivElement>;
 }
-const Canvas = ({ children, isItemDragging, canvasRef }: Props) => {
-  const [canvasPosition, setCanvasPosition] = useState({ x: 0, y: 0 });
+const Canvas = ({ children, isItemDragging }: Props) => {
+  const canvasPosition = useWorkspaceStore((state) => state.canvas.position);
+  const setCanvasPosition = useWorkspaceStore(
+    (state) => state.setCanvasPosition,
+  );
   const [canvasTranslate, setCanvasTranslate] = useState({ x: 0, y: 0 });
   const [mouseStart, setMouseStart] = useState<null | Position>(null);
 
@@ -39,10 +41,10 @@ const Canvas = ({ children, isItemDragging, canvasRef }: Props) => {
 
   const onMouseUp = (e: React.MouseEvent<HTMLDivElement>) => {
     setMouseStart(null);
-    setCanvasPosition((pre) => ({
-      x: pre.x + canvasTranslate.x,
-      y: pre.y + canvasTranslate.y,
-    }));
+    setCanvasPosition({
+      x: canvasPosition.x + canvasTranslate.x,
+      y: canvasPosition.y + canvasTranslate.y,
+    });
     setCanvasTranslate({
       x: 0,
       y: 0,
@@ -50,20 +52,16 @@ const Canvas = ({ children, isItemDragging, canvasRef }: Props) => {
   };
 
   const onWheel = (e: React.WheelEvent<HTMLDivElement>) => {
-    if (!canvasRef.current) return;
-    const { x: canvasX, y: canvasY } =
-      canvasRef.current.getBoundingClientRect();
+    const { x: canvasX, y: canvasY } = canvasPosition;
 
     const { deltaY, clientX, clientY } = e;
     const scaleSize = deltaY < 0 ? 0.1 : -0.1;
     const tx = (clientX - canvasX) * scaleSize;
     const ty = (clientY - canvasY) * scaleSize;
     scaling(canvas.scale * (1 + scaleSize));
-    setCanvasPosition((pre) => {
-      return {
-        x: pre.x - tx,
-        y: pre.y - ty,
-      };
+    setCanvasPosition({
+      x: canvasPosition.x - tx,
+      y: canvasPosition.y - ty,
     });
   };
 
@@ -95,7 +93,6 @@ const Canvas = ({ children, isItemDragging, canvasRef }: Props) => {
         className="absolute inset-0 h-full w-full overflow-hidden bg-white bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:20px_20px]"
       >
         <div
-          ref={canvasRef}
           id="canvas"
           style={{
             ...canvasPositionStyle,
@@ -105,7 +102,7 @@ const Canvas = ({ children, isItemDragging, canvasRef }: Props) => {
           className="fixed h-8 w-8 border-4 border-b-0 border-r-0 border-solid border-slate-600"
         >
           {children}
-          {connectingNode && <ConnectingLine canvasRef={canvasRef} />}
+          {connectingNode && <ConnectingLine />}
         </div>
       </div>
     </DndContext>

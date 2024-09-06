@@ -4,42 +4,43 @@ import { type ReactNode, createContext, useRef, useContext } from "react";
 import { type StoreApi, useStore } from "zustand";
 
 import {
-    type WorkspaceStore,
-    createWorkspaceStore,
+  type WorkspaceStore,
+  createWorkspaceStore,
 } from "@/stores/workspace-store";
 
 export const WorkspaceStoreContext =
-    createContext<StoreApi<WorkspaceStore> | null>(null);
+  createContext<StoreApi<WorkspaceStore> | null>(null);
 
 export interface WorkspaceStoreProviderProps {
-    children: ReactNode;
+  children: ReactNode;
 }
 
 export const WorkspaceStoreProvider = ({
-    children,
+  children,
 }: WorkspaceStoreProviderProps) => {
-    const storeRef = useRef<StoreApi<WorkspaceStore>>();
-    if (!storeRef.current) {
-        storeRef.current = createWorkspaceStore();
-    }
+  const storeRef = useRef<StoreApi<WorkspaceStore>>();
+  if (!storeRef.current) {
+    storeRef.current = createWorkspaceStore();
+  }
 
-    return (
-        <WorkspaceStoreContext.Provider value={storeRef.current}>
-            {children}
-        </WorkspaceStoreContext.Provider>
-    );
+  return (
+    <WorkspaceStoreContext.Provider value={storeRef.current}>
+      {children}
+    </WorkspaceStoreContext.Provider>
+  );
 };
 
 export const useWorkspaceStore = <T,>(
-    selector: (store: WorkspaceStore) => T
+  selector: (store: WorkspaceStore) => T,
+  equalityFn?: (left: T, right: T) => boolean,
 ): T => {
-    const workspaceStoreContext = useContext(WorkspaceStoreContext);
+  const workspaceStoreContext = useContext(WorkspaceStoreContext);
 
-    if (!workspaceStoreContext) {
-        throw new Error(
-            `useWorkspaceStore must be use within WorkspaceStoreProvider`
-        );
-    }
+  if (!workspaceStoreContext) {
+    throw new Error(
+      `useWorkspaceStore must be use within WorkspaceStoreProvider`,
+    );
+  }
 
-    return useStore(workspaceStoreContext, selector);
+  return useStore(workspaceStoreContext, selector, equalityFn);
 };

@@ -1,43 +1,38 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDraggable, useDndMonitor } from "@dnd-kit/core";
 import { type DragEndEvent } from "@dnd-kit/core";
 import { useWorkspaceStore } from "@/providers/workspace-store-provider";
-
-import { type Coordinates } from "@dnd-kit/core/dist/types";
+import { shallow } from "zustand/shallow";
 interface Props {
   children: React.ReactNode;
   draggableId: string;
   scale: number;
   setIsItemDragging: (isDragging: boolean) => void;
-  canvasRef: React.RefObject<HTMLDivElement>;
 }
 
 function Draggable(props: Props) {
-  const startPosition = () => {
-    if (!props.canvasRef.current) return { x: 0, y: 0 };
-    const { x, y } = props.canvasRef.current.getBoundingClientRect();
-    return { x: (-x + 10) / props.scale, y: (-y + 10) / props.scale };
-  };
-  const { updateNode } = useWorkspaceStore((state) => state);
-  const table = useWorkspaceStore((state) =>
-    state.tables.find((t) => t.id === +props.draggableId),
-  );
-  const [position, setPosition] = useState<Coordinates>(startPosition());
-  useEffect(() => {
-    updateNode(+props.draggableId, {
-      x: position.x,
-      y: position.y,
-    });
-  }, [position.x, position.y, props.draggableId, updateNode, table]);
+  // const startPosition = useCallback(() => {
+  //   if (!props.canvasRef.current) return { x: 0, y: 0 };
+  //   const { x, y } = props.canvasRef.current.getBoundingClientRect();
+  //   return { x: (-x + 10) / props.scale, y: (-y + 10) / props.scale };
+  // }, [props.canvasRef, props.scale]);
+  const updateNode = useWorkspaceStore((state) => state.updateNode);
+  const setPosition = useWorkspaceStore((state) => state.setTablePosition);
+  const table = useWorkspaceStore(
+    (state) => state.tables.find((t) => t.id === +props.draggableId),
+    shallow,
+  )!;
+  console.log(123);
+  const position = table?.position;
   const onDragEnd = (event: DragEndEvent) => {
     if (event.active.id !== props.draggableId) return;
     const { x, y } = event.delta;
-    setPosition((pre) => ({
-      x: pre.x + x / props.scale,
-      y: pre.y + y / props.scale,
-    }));
+    setPosition(table.id, {
+      x: position.x + x / props.scale,
+      y: position.y + y / props.scale,
+    });
     props.setIsItemDragging(false);
   };
   const onDragStart = (event: DragEndEvent) => {

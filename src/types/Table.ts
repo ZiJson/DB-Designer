@@ -1,9 +1,11 @@
+import { Coordinates } from "@dnd-kit/core/dist/types";
 import { FiledTypes } from "./FieldTypes";
 
 export type TableModal = {
   id: number;
-  name: string | null;
+  name: string;
   fields: Field[];
+  position: Coordinates;
 };
 
 export type Field = {
@@ -11,7 +13,8 @@ export type Field = {
   name: string;
   defaultValue: string | null;
 } & FiledTypes &
-  FieldToggle;
+  FieldToggle &
+  FieldRelation;
 
 export type FieldToggle = {
   [K in ToggleType]: boolean;
@@ -23,3 +26,10 @@ export enum ToggleType {
   Unique = "unique",
   Array = "toArray",
 }
+
+export type FieldRelation = {
+  relation?: {
+    tableId: number;
+    fieldId: number;
+  };
+};

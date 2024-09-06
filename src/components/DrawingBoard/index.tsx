@@ -8,7 +8,6 @@ import { getConnectMode } from "@/lib/tools";
 
 const DrawingBoard = () => {
   const [isItemDragging, setIsItemDragging] = useState(false);
-  const canvasRef = useRef<HTMLDivElement>(null);
 
   const {
     tables,
@@ -18,14 +17,13 @@ const DrawingBoard = () => {
     canvas: { scale: canvasScale },
   } = useWorkspaceStore((state) => state);
   return (
-    <Canvas isItemDragging={isItemDragging} canvasRef={canvasRef}>
+    <Canvas isItemDragging={isItemDragging}>
       {tables.map((table) => (
         <Draggable
           key={table.id}
           draggableId={table.id.toString()}
           scale={canvasScale}
           setIsItemDragging={setIsItemDragging}
-          canvasRef={canvasRef}
         >
           <TableModal
             onRemove={() => removeTable(table.id)}

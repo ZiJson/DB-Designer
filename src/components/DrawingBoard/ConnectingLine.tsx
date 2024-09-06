@@ -5,16 +5,14 @@ import ConnectLine, { CONNECT_MODE } from "./ConnectLine";
 import { useWorkspaceStore } from "@/providers/workspace-store-provider";
 import { getCloserPoint } from "@/lib/tools";
 
-type Props = {
-  canvasRef: React.RefObject<HTMLDivElement>;
-};
-const ConnectingLine = ({ canvasRef }: Props) => {
+const ConnectingLine = () => {
   const connectedNodeIdRef = useRef<number | null>(null);
   const canvasScale = useWorkspaceStore((state) => state.canvas.scale);
   const nodes = useWorkspaceStore((state) => state.nodes);
   const addLine = useWorkspaceStore((state) => state.addLine);
   const setIsConnecting = useWorkspaceStore((state) => state.setConnectingNode);
   const connectingNode = useWorkspaceStore((state) => state.connectingNode);
+  const canvasPosition = useWorkspaceStore((state) => state.canvas.position);
   const fixedPoints: Coordinates = nodes.find(
     (node) => node.id === connectingNode,
   )?.coordinates || { x: 0, y: 0 };
@@ -23,10 +21,9 @@ const ConnectingLine = ({ canvasRef }: Props) => {
 
   useEffect(() => {
     const handleMouseMove = (event: MouseEvent) => {
-      if (!canvasRef.current) return;
-      const rect = canvasRef.current.getBoundingClientRect();
-      const mouseX = (event.clientX - rect.left) / canvasScale;
-      const mouseY = (event.clientY - rect.top) / canvasScale;
+      const rect = canvasPosition;
+      const mouseX = (event.clientX - rect.x) / canvasScale;
+      const mouseY = (event.clientY - rect.y) / canvasScale;
       const closestPointIndex = getCloserPoint(
         { x: mouseX, y: mouseY },
         otherNodes.map((node) => node.coordinates),
@@ -44,7 +41,7 @@ const ConnectingLine = ({ canvasRef }: Props) => {
     };
     window.addEventListener("mousemove", handleMouseMove, { capture: true });
     return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, [canvasRef, canvasScale, otherNodes, nodes]);
+  }, [canvasScale, otherNodes, nodes, canvasPosition]);
 
   useEffect(() => {
     document.body.style.cursor = "grabbing";
@@ -55,7 +52,6 @@ const ConnectingLine = ({ canvasRef }: Props) => {
 
   const onMouseUp = () => {
     setIsConnecting(null);
-    console.log(connectingNode, connectedNodeIdRef.current);
     connectedNodeIdRef.current &&
       connectingNode &&
       addLine(connectingNode, connectedNodeIdRef.current);

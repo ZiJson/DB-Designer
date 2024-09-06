@@ -1,11 +1,15 @@
-import { createStore } from "zustand/vanilla";
+import { createStore, StateCreator } from "zustand/vanilla";
 import { Field, ToggleType, type TableModal } from "@/types/Table";
 import { type Connection, type FieldNode } from "@/types/Connection";
 import { type CanvasState } from "@/types/Canvas";
 import { FieldTypes } from "@/types/FieldTypes";
+import { devtools, persist } from "zustand/middleware";
 import { createSettingActions, WorkspaceSettingActions } from "./actions/set";
 import { createGettingActions, WorkspaceGettingActions } from "./actions/get";
 import { createToolActions, WorkspaceToolActions } from "./actions/tool";
+import { immer } from "zustand/middleware/immer";
+import { CanvasStore, createCanvasStore } from "./CanvasStore.ts";
+import { TableStore } from "./TableStore.ts";
 
 export type WorkspaceState = {
   canvas: CanvasState;
@@ -16,21 +20,9 @@ export type WorkspaceState = {
   isDashboardOpen: boolean;
 };
 
-export type WorkspaceActions = {
-  scaling: (scale: number) => void;
-  addTable: () => void;
-  updateTable: (table: TableModal) => void;
-  removeTable: (id: number) => void;
-  updateNode: (id: number, coordinates: { x: number; y: number }) => void;
-  setConnectingNode: (id: null | number) => void;
-  addLine: (nodeId1: number, nodeId2: number) => void;
-  addField: (tableId: number, name: string, fieldType: FieldTypes) => void;
-  addNode: (tableId: number, fieldId: number) => void;
-  getNodesByTableId: (tableId: number) => FieldNode[];
-  setIsDashboardOpen: (isDashboardOpen: boolean) => void;
-};
-
 export type WorkspaceStore = WorkspaceState &
+  CanvasStore &
+  TableStore &
   WorkspaceSettingActions &
   WorkspaceGettingActions &
   WorkspaceToolActions;
@@ -38,6 +30,7 @@ export type WorkspaceStore = WorkspaceState &
 export const defaultInitState: WorkspaceState = {
   canvas: {
     scale: 1,
+    position: { x: 0, y: 0 },
   },
   tables: [],
   lines: [],
@@ -46,24 +39,30 @@ export const defaultInitState: WorkspaceState = {
   isDashboardOpen: false,
 };
 
-export const defaultField: Field = {
-  id: 1,
-  name: "",
-  type: FieldTypes.INT,
-  [ToggleType.Nullable]: false,
-  [ToggleType.Unique]: false,
-  [ToggleType.Array]: false,
-  [ToggleType.PrimaryKey]: false,
-  defaultValue: null,
-};
-
 export const createWorkspaceStore = (
   initState: WorkspaceState = defaultInitState,
 ) => {
-  return createStore<WorkspaceStore>()((...args) => ({
-    ...initState,
-    ...createSettingActions(...args),
-    ...createGettingActions(...args),
-    ...createToolActions(...args),
-  }));
+  return createStore<WorkspaceStore>()(
+    devtools(
+      persist(
+        immer((...args) => ({
+          ...initState,
+          ...createCanvasStore(...args),
+          ...createSettingActions(...args),
+          ...createGettingActions(...args),
+          ...createToolActions(...args),
+        })),
+        {
+          name: "workspace-store",
+        },
+      ),
+    ),
+  );
 };
+
+export type ImmerStateCreator<T extends Partial<WorkspaceStore>> = StateCreator<
+  WorkspaceStore,
+  [["zustand/immer", never], never],
+  [],
+  T
+>;
