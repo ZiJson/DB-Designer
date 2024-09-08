@@ -1,38 +1,27 @@
 import { createStore, StateCreator } from "zustand/vanilla";
-import { Field, ToggleType, type TableModal } from "@/types/Table";
 import { type Connection, type FieldNode } from "@/types/Connection";
-import { type CanvasState } from "@/types/Canvas";
-import { FieldTypes } from "@/types/FieldTypes";
 import { devtools, persist } from "zustand/middleware";
-import { createSettingActions, WorkspaceSettingActions } from "./actions/set";
-import { createGettingActions, WorkspaceGettingActions } from "./actions/get";
-import { createToolActions, WorkspaceToolActions } from "./actions/tool";
 import { immer } from "zustand/middleware/immer";
 import { CanvasStore, createCanvasStore } from "./CanvasStore.ts";
-import { TableStore } from "./TableStore.ts";
+import { createTableStore, TableStore } from "./TableStore.ts";
 
 export type WorkspaceState = {
-  canvas: CanvasState;
-  tables: TableModal[];
   lines: Connection[];
   nodes: FieldNode[];
   connectingNode: null | number;
   isDashboardOpen: boolean;
 };
 
+export type WorkspaceActions = {
+  setIsDashboardOpen: (isDashboardOpen: boolean) => void;
+};
+
 export type WorkspaceStore = WorkspaceState &
   CanvasStore &
   TableStore &
-  WorkspaceSettingActions &
-  WorkspaceGettingActions &
-  WorkspaceToolActions;
+  WorkspaceActions;
 
 export const defaultInitState: WorkspaceState = {
-  canvas: {
-    scale: 1,
-    position: { x: 0, y: 0 },
-  },
-  tables: [],
   lines: [],
   nodes: [],
   connectingNode: null,
@@ -44,18 +33,21 @@ export const createWorkspaceStore = (
 ) => {
   return createStore<WorkspaceStore>()(
     devtools(
-      persist(
-        immer((...args) => ({
-          ...initState,
-          ...createCanvasStore(...args),
-          ...createSettingActions(...args),
-          ...createGettingActions(...args),
-          ...createToolActions(...args),
-        })),
-        {
-          name: "workspace-store",
+      // persist(
+      immer((...args) => ({
+        ...initState,
+        ...createCanvasStore(...args),
+        ...createTableStore(...args),
+        setIsDashboardOpen: (isDashboardOpen) => {
+          args[0]((state) => {
+            state.isDashboardOpen = isDashboardOpen;
+          });
         },
-      ),
+      })),
+      //   {
+      //     name: "workspace-store",
+      //   },
+      // ),
     ),
   );
 };

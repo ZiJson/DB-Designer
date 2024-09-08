@@ -30,13 +30,13 @@ interface AddFieldProps extends PropsWithChildren {
 }
 
 const AddField = ({ children, tableId }: AddFieldProps) => {
-  const addField = useWorkspaceStore((state) => state.addField);
+  const addNewField = useWorkspaceStore((state) => state.addNewField);
   const [name, setName] = useState("");
   const [type, setType] = useState<FieldTypes | null>(null);
 
   const onSubmit = () => {
     if (!name || !type) return;
-    addField(tableId, name, type);
+    addNewField(tableId, name, type);
     setName("");
     setType(null);
   };

@@ -4,8 +4,9 @@ import Content from "./Content";
 import { useWorkspaceStore } from "@/providers/workspace-store-provider";
 
 const DashBoard = () => {
-  const { setIsDashboardOpen, isDashboardOpen } = useWorkspaceStore(
-    (state) => state,
+  const isDashboardOpen = useWorkspaceStore((state) => state.isDashboardOpen);
+  const setIsDashboardOpen = useWorkspaceStore(
+    (state) => state.setIsDashboardOpen,
   );
   return (
     <div

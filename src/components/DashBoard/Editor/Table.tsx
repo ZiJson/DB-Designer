@@ -1,4 +1,4 @@
-import { TableModal, ToggleType } from "@/types/Table";
+import { FieldToggle, TableModal, ToggleType } from "@/types/Table";
 import {
   Card,
   CardContent,
@@ -27,23 +27,35 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FieldTypes } from "@/types/FieldTypes";
 import { useWorkspaceStore } from "@/providers/workspace-store-provider";
-import { FocusEvent, FormEvent, useEffect, useState } from "react";
+import {
+  FocusEvent,
+  FormEvent,
+  memo,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import { Check, ListPlus, Pencil } from "lucide-react";
 import ToggleIcon from "./ToggleIcon";
 import * as Sheet from "../../Sheets";
 import { Button } from "@/components/ui/button";
 
 interface Props {
-  table: TableModal;
+  tableId: TableModal["id"];
 }
-const Table = ({ table }: Props) => {
+const Table = ({ tableId }: Props) => {
+  const table = useWorkspaceStore((state) =>
+    state.tables.find((t) => t.id === tableId),
+  )!;
+
   const updateTable = useWorkspaceStore((state) => state.updateTable);
+  const updateField = useWorkspaceStore((state) => state.updateField);
   const [names, setNames] = useState<string[]>([]);
   const [tableName, setTableName] = useState<string | null>(null);
 
-  useEffect(() => {
-    setNames(table.fields.map((field) => field.name));
-  }, [table]);
+  // useEffect(() => {
+  //   setNames(table.fields.map((field) => field.name));
+  // }, [table]);
 
   const onUpdateTable = (fieldKey: string, fieldIndex: number, value: any) => {
     const newFields: TableModal["fields"] = table.fields.map((field, i) => {
@@ -76,6 +88,7 @@ const Table = ({ table }: Props) => {
     e: FormEvent<HTMLFormElement> | FocusEvent<HTMLInputElement>,
   ) => {
     e.preventDefault();
+    if (!tableName) return;
     updateTable({
       ...table,
       name: tableName,
@@ -87,7 +100,16 @@ const Table = ({ table }: Props) => {
     (fieldKey: string, fieldIndex: number) => (value: string | boolean) => {
       onUpdateTable(fieldKey, fieldIndex, value as FieldTypes);
     };
-
+  const onFieldNameChange = useCallback(
+    (fieldId: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      e.preventDefault();
+      const value = e.target.value;
+      const oldField = table.fields.find((field) => field.id === fieldId);
+      if (!oldField) return;
+      updateField(tableId, { ...oldField, name: value });
+    },
+    [updateField],
+  );
   return (
     <Card className="shadow-md">
       <CardHeader>
@@ -125,34 +147,16 @@ const Table = ({ table }: Props) => {
       <CardContent className="grid gap-2">
         {table.fields.map(
           ({ id, name, type, defaultValue, ...toggleRest }, fieldIndex) => (
-            <div key={name} className="grid grid-cols-3 gap-2">
+            <div key={id} className="grid grid-cols-3 gap-2">
               <div className="col-span-2 grid w-full max-w-sm items-center gap-1.5">
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    onUpdateTable("name", fieldIndex, names[fieldIndex]);
-                  }}
-                  className="group relative"
-                >
-                  <Label htmlFor={`name-${table.id}-${fieldIndex}`}>Name</Label>
-                  <Input
-                    type="text"
-                    id={`name-${table.id}-${fieldIndex}`}
-                    defaultValue={name}
-                    onChange={onChange}
-                    onBlur={(e) => {
-                      e.preventDefault();
-                      onUpdateTable("name", fieldIndex, names[fieldIndex]);
-                    }}
-                    name={`name-${table.id}-${fieldIndex}`}
-                  />
-                  <button
-                    type="submit"
-                    className="absolute right-2 top-[50%] hidden translate-y-[-5%] group-focus-within:block"
-                  >
-                    <Check className="rounded-full p-1 hover:bg-slate-200" />
-                  </button>
-                </form>
+                <Label htmlFor={`name-${table.id}-${fieldIndex}`}>Name</Label>
+                <Input
+                  type="text"
+                  id={`name-${table.id}-${fieldIndex}`}
+                  defaultValue={name}
+                  onChange={onFieldNameChange(fieldIndex)}
+                  name={`name-${table.id}-${fieldIndex}`}
+                />
               </div>
               <div className="grid w-full max-w-sm items-center gap-1.5">
                 <Label htmlFor={`type-${table.id}-${fieldIndex}`}>Type</Label>
@@ -185,9 +189,7 @@ const Table = ({ table }: Props) => {
                         <TooltipTrigger asChild>
                           <div>
                             <Toggle
-                              pressed={
-                                toggleRest[item as keyof typeof toggleRest]
-                              }
+                              pressed={toggleRest[item as keyof FieldToggle]}
                               onPressedChange={onValueChange(item, fieldIndex)}
                             >
                               <ToggleIcon
@@ -218,4 +220,4 @@ const Table = ({ table }: Props) => {
   );
 };
 
-export default Table;
+export default memo(Table);

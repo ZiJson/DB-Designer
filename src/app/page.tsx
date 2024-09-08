@@ -5,13 +5,13 @@ import DashBoard from "@/components/DashBoard";
 import DrawingBoard from "@/components/DrawingBoard";
 
 const Page = () => {
-  const addTable = useWorkspaceStore((state) => state.addTable);
+  const addNewTable = useWorkspaceStore((state) => state.addNewTable);
   return (
     <div>
       <DrawingBoard />
       <DashBoard />
       <Button
-        onClick={addTable}
+        onClick={addNewTable}
         className="absolute right-[50%] top-5 translate-x-[50%]"
       >
         New Table

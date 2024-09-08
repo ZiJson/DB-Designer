@@ -2,6 +2,7 @@
 
 import { type ReactNode, createContext, useRef, useContext } from "react";
 import { type StoreApi, useStore } from "zustand";
+import { useStoreWithEqualityFn } from "zustand/traditional";
 
 import {
   type WorkspaceStore,
@@ -42,5 +43,5 @@ export const useWorkspaceStore = <T,>(
     );
   }
 
-  return useStore(workspaceStoreContext, selector, equalityFn);
+  return useStoreWithEqualityFn(workspaceStoreContext, selector, equalityFn);
 };
