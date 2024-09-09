@@ -244,7 +244,6 @@ export const createSettingActions: StateCreator<
     });
   },
   removeRelationField: (node: FieldNode) => {
-    console.log(node);
     const { tableId, fieldId } = node;
     const table = get().tables.find((t) => t.id === tableId)!;
     const newTable = {

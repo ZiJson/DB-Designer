@@ -5,7 +5,7 @@ const ToggleIcon = ({
   toggleKey,
   className,
 }: {
-  toggleKey: ToggleType;
+  toggleKey: ToggleType | string;
   className?: string;
 }) => {
   switch (toggleKey) {

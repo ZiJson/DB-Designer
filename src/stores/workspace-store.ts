@@ -1,14 +1,11 @@
 import { createStore, StateCreator } from "zustand/vanilla";
-import { type Connection, type FieldNode } from "@/types/Connection";
 import { devtools, persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
-import { CanvasStore, createCanvasStore } from "./CanvasStore.ts";
-import { createTableStore, TableStore } from "./TableStore.ts";
+import { CanvasStore, createCanvasStore } from "./CanvasStore";
+import { createTableStore, TableStore } from "./TableStore";
+import { createRelationStore, RelationStore } from "./RelationStore";
 
 export type WorkspaceState = {
-  lines: Connection[];
-  nodes: FieldNode[];
-  connectingNode: null | number;
   isDashboardOpen: boolean;
 };
 
@@ -19,12 +16,10 @@ export type WorkspaceActions = {
 export type WorkspaceStore = WorkspaceState &
   CanvasStore &
   TableStore &
+  RelationStore &
   WorkspaceActions;
 
 export const defaultInitState: WorkspaceState = {
-  lines: [],
-  nodes: [],
-  connectingNode: null,
   isDashboardOpen: false,
 };
 
@@ -38,6 +33,7 @@ export const createWorkspaceStore = (
         ...initState,
         ...createCanvasStore(...args),
         ...createTableStore(...args),
+        ...createRelationStore(...args),
         setIsDashboardOpen: (isDashboardOpen) => {
           args[0]((state) => {
             state.isDashboardOpen = isDashboardOpen;

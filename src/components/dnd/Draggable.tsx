@@ -28,6 +28,7 @@ function Draggable({
   className,
   disabled = false,
 }: Props) {
+  const scale = useWorkspaceStore((state) => state.scale);
   useDndMonitor({ onDragEnd, onDragStart, onDragMove });
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
@@ -36,12 +37,15 @@ function Draggable({
     });
 
   useEffect(() => {
-    setTransform && setTransform(transform);
+    if (!setTransform) return;
+    transform
+      ? setTransform({ x: transform.x, y: transform.y })
+      : setTransform(null);
   }, [transform, setTransform]);
 
   const transformStyle = !setTransform &&
     transform && {
-      transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+      transform: `translate3d(${transform.x / scale}px, ${transform.y / scale}px, 0)`,
     };
 
   return (
@@ -50,7 +54,7 @@ function Draggable({
       {...listeners}
       {...attributes}
       style={{ ...transformStyle }}
-      className={`${className} ${isDragging ? "cursor-grabbing" : "cursor-default"}`}
+      className={`${className} ${isDragging ? "cursor-grabbing" : ""}`}
     >
       {children}
     </div>

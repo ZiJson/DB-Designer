@@ -16,13 +16,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { Toggle } from "@/components/ui/toggle";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FieldTypes } from "@/types/FieldTypes";
@@ -32,103 +25,60 @@ import {
   FormEvent,
   memo,
   useCallback,
-  useEffect,
+  useMemo,
   useState,
 } from "react";
 import { Check, ListPlus, Pencil } from "lucide-react";
-import ToggleIcon from "./ToggleIcon";
 import * as Sheet from "../../Sheets";
 import { Button } from "@/components/ui/button";
+import { CustomToggle } from "@/components/CustomUI";
 
 interface Props {
-  tableId: TableModal["id"];
+  table: TableModal;
 }
-const Table = ({ tableId }: Props) => {
-  const table = useWorkspaceStore((state) =>
-    state.tables.find((t) => t.id === tableId),
-  )!;
-
+const Table = ({ table }: Props) => {
   const updateTable = useWorkspaceStore((state) => state.updateTable);
   const updateField = useWorkspaceStore((state) => state.updateField);
-  const [names, setNames] = useState<string[]>([]);
-  const [tableName, setTableName] = useState<string | null>(null);
+  const [isTitleEditing, setIsTitleEditing] = useState<boolean>(false);
 
-  // useEffect(() => {
-  //   setNames(table.fields.map((field) => field.name));
-  // }, [table]);
+  const onValueChange = useCallback(
+    (fieldKey: string, fieldIndex: number) => (value: boolean | string) => {
+      const oldField = table.fields.find((field) => field.id === fieldIndex);
+      if (!oldField) return;
+      updateField(table.id, { ...oldField, [fieldKey]: value });
+    },
+    [table.fields, updateField, table.id],
+  );
 
-  const onUpdateTable = (fieldKey: string, fieldIndex: number, value: any) => {
-    const newFields: TableModal["fields"] = table.fields.map((field, i) => {
-      if (i === +fieldIndex) {
-        return {
-          ...field,
-          [fieldKey]: value,
-        };
-      }
-      return field;
-    });
-    const newTable: TableModal = {
-      ...table,
-      fields: newFields,
-    };
-    updateTable(newTable);
-  };
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    const fieldIndex = e.target.name.split("-").at(-1);
-    if (!fieldIndex) return;
-    setNames((pre) =>
-      pre.map((name, index) => {
-        if (+fieldIndex !== index) return name;
-        return value;
-      }),
-    );
-  };
-  const onUpdateTableName = (
-    e: FormEvent<HTMLFormElement> | FocusEvent<HTMLInputElement>,
-  ) => {
-    e.preventDefault();
-    if (!tableName) return;
-    updateTable({
-      ...table,
-      name: tableName,
-    });
-    setTableName(null);
-  };
-
-  const onValueChange =
-    (fieldKey: string, fieldIndex: number) => (value: string | boolean) => {
-      onUpdateTable(fieldKey, fieldIndex, value as FieldTypes);
-    };
   const onFieldNameChange = useCallback(
     (fieldId: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
       e.preventDefault();
-      const value = e.target.value;
       const oldField = table.fields.find((field) => field.id === fieldId);
       if (!oldField) return;
-      updateField(tableId, { ...oldField, name: value });
+      updateField(table.id, { ...oldField, name: e.target.value });
     },
     [updateField],
   );
+
+  const onTableNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    updateTable({
+      ...table,
+      name: e.target.value,
+    });
+  };
   return (
     <Card className="shadow-md">
       <CardHeader>
         <CardTitle className="flex items-center">
-          {tableName ? (
-            <form onSubmit={onUpdateTableName} className="group relative">
-              <Input
-                className="w-fit"
-                defaultValue={table.name!}
-                onChange={(e) => setTableName(e.target.value)}
-                onBlur={onUpdateTableName}
-              />
-              <button
-                type="submit"
-                className="absolute right-2 top-[50%] hidden translate-y-[-50%] group-focus-within:block"
-              >
-                <Check className="rounded-full p-1 hover:bg-slate-200" />
-              </button>
-            </form>
+          {isTitleEditing ? (
+            <Input
+              className="w-fit"
+              defaultValue={table.name!}
+              onChange={onTableNameChange}
+              autoFocus
+              onBlur={() => setIsTitleEditing(false)}
+            />
           ) : (
             <>
               <p>{table.name}</p>
@@ -136,7 +86,7 @@ const Table = ({ tableId }: Props) => {
                 size="icon"
                 variant="ghost"
                 className="ml-1"
-                onClick={() => !tableName && setTableName(table.name)}
+                onClick={() => setIsTitleEditing(true)}
               >
                 <Pencil className="h-4 w-4" />
               </Button>
@@ -181,30 +131,15 @@ const Table = ({ tableId }: Props) => {
                 </Select>
               </div>
               <div className="col-span-3 flex justify-start gap-1">
-                {Object.keys(toggleRest)
-                  .reverse()
-                  .map((item) => (
-                    <TooltipProvider key={item}>
-                      <Tooltip delayDuration={300}>
-                        <TooltipTrigger asChild>
-                          <div>
-                            <Toggle
-                              pressed={toggleRest[item as keyof FieldToggle]}
-                              onPressedChange={onValueChange(item, fieldIndex)}
-                            >
-                              <ToggleIcon
-                                toggleKey={item as ToggleType}
-                                className="h-4 w-4"
-                              />
-                            </Toggle>
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>{item}</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  ))}
+                {Object.keys(toggleRest).map((item) => (
+                  <CustomToggle
+                    key={item}
+                    toggleKey={item}
+                    pressed={toggleRest[item as keyof FieldToggle]}
+                    onPressedChange={onValueChange(item, fieldIndex)}
+                    tooltipContent={item}
+                  />
+                ))}
               </div>
             </div>
           ),

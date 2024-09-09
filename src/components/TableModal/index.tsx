@@ -14,13 +14,14 @@ import { DragEndEvent } from "@dnd-kit/core";
 import { shallow } from "zustand/shallow";
 
 interface Props {
-  onRemove: () => void;
   tableData: TableModal;
 }
-const TableModal = ({ onRemove, tableData }: Props) => {
+const TableModal = ({ tableData }: Props) => {
   const updateTablePosition = useWorkspaceStore(
     (state) => state.updateTablePosition,
   );
+  const removeTable = useWorkspaceStore((state) => state.removeTable);
+  const scale = useWorkspaceStore((state) => state.scale);
   const position = useWorkspaceStore(
     (state) =>
       state.tables.find((table) => table.id === tableData.id)!.position,
@@ -29,8 +30,13 @@ const TableModal = ({ onRemove, tableData }: Props) => {
   const onDragEnd = (event: DragEndEvent) => {
     if (event.active.id !== tableData.id.toString()) return;
     const { x, y } = event.delta;
-    console.log(132);
-    updateTablePosition(tableData.id, { x: x + position.x, y: y + position.y });
+    updateTablePosition(tableData.id, {
+      x: x / scale + position.x,
+      y: y / scale + position.y,
+    });
+  };
+  const onRemove = () => {
+    removeTable(tableData.id);
   };
   const positionStyle = {
     top: position.y,
