@@ -26,7 +26,7 @@ import { useWorkspaceStore } from "@/providers/workspace-store-provider";
 import { ArrowLeftRight } from "lucide-react";
 
 interface AddFieldProps extends PropsWithChildren {
-  tableId: number;
+  tableId: string;
 }
 
 const AddField = ({ children, tableId }: AddFieldProps) => {

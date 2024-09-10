@@ -1,29 +1,20 @@
 import { Field } from "@/types/Table";
 import Node from "./Node";
 
-const FieldRow = ({
-  field,
-  tableId,
-  fieldId,
-}: {
-  field: Field;
-  tableId: number;
-  fieldId: number;
-}) => {
-  return <BaseFieldRow field={field} tableId={tableId} fieldId={fieldId} />;
+const FieldRow = ({ field, tableId }: { field: Field; tableId: string }) => {
+  console.log(field.relations);
+  return <BaseFieldRow field={field} tableId={tableId} />;
 };
 
 const BaseFieldRow = ({
   field,
   tableId,
-  fieldId,
 }: {
   field: Field;
-  tableId: number;
-  fieldId: number;
+  tableId: string;
 }) => (
   <div className="relative flex w-full justify-between rounded-md px-3 py-1 hover:bg-gray-50">
-    <Node tableId={tableId} fieldId={fieldId} />
+    <Node tableId={tableId} fieldId={field.id} />
     <p>{field.name}</p>
     <p className="text-slate-400">{field.type}</p>
   </div>

@@ -1,14 +1,47 @@
 import { useWorkspaceStore } from "@/providers/workspace-store-provider";
 import * as Editor from "./Editor";
+import { Card, CardHeader, CardTitle } from "../ui/card";
+import { TableModal } from "@/types/Table";
+import TableCard from "./TableCard.tsx";
 
 const Content = () => {
   const tables = useWorkspaceStore((state) => state.tables);
+  const activeTableId = useWorkspaceStore((state) => state.activeTableId);
+  const isDashboardOpen = useWorkspaceStore((state) => state.isDashboardOpen);
   return (
     <div>
-      <h1>Content</h1>
       <div className="grid grid-cols-1 gap-4">
         {tables.map((table) => (
-          <Editor.Table key={table.id} table={table} />
+          <TableCard
+            key={table.id}
+            table={table}
+            className={`${
+              activeTableId === table.id ? "max-h-[100%]" : "max-h-[3rem]"
+            } cursor-pointer overflow-hidden transition-all duration-300 ease-in-out hover:shadow-md`}
+          >
+            {activeTableId === table.id ? (
+              <Editor.Table table={table} />
+            ) : (
+              <CardHeader className="p-0">
+                <CardTitle className="relative flex min-h-[2.8rem] items-center gap-2 overflow-hidden">
+                  <div
+                    className={`absolute top-0 flex h-full w-full items-center justify-center transition-all duration-300 ease-in-out ${
+                      !isDashboardOpen ? "left-0" : "-left-full"
+                    }`}
+                  >
+                    {table.name[0]}
+                  </div>
+                  <div
+                    className={`absolute top-0 flex h-full w-full items-center justify-start pl-6 transition-all duration-300 ease-in-out ${
+                      isDashboardOpen ? "left-0" : "left-full"
+                    }`}
+                  >
+                    {table.name}
+                  </div>
+                </CardTitle>
+              </CardHeader>
+            )}
+          </TableCard>
         ))}
       </div>
     </div>

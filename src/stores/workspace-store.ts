@@ -4,24 +4,20 @@ import { immer } from "zustand/middleware/immer";
 import { CanvasStore, createCanvasStore } from "./CanvasStore";
 import { createTableStore, TableStore } from "./TableStore";
 import { createRelationStore, RelationStore } from "./RelationStore";
+import { createDashboardStore, DashboardStore } from "./Dashboard";
 
-export type WorkspaceState = {
-  isDashboardOpen: boolean;
-};
+export type WorkspaceState = {};
 
-export type WorkspaceActions = {
-  setIsDashboardOpen: (isDashboardOpen: boolean) => void;
-};
+export type WorkspaceActions = {};
 
 export type WorkspaceStore = WorkspaceState &
+  WorkspaceActions &
   CanvasStore &
   TableStore &
   RelationStore &
-  WorkspaceActions;
+  DashboardStore;
 
-export const defaultInitState: WorkspaceState = {
-  isDashboardOpen: false,
-};
+export const defaultInitState: WorkspaceState = {};
 
 export const createWorkspaceStore = (
   initState: WorkspaceState = defaultInitState,
@@ -34,11 +30,7 @@ export const createWorkspaceStore = (
         ...createCanvasStore(...args),
         ...createTableStore(...args),
         ...createRelationStore(...args),
-        setIsDashboardOpen: (isDashboardOpen) => {
-          args[0]((state) => {
-            state.isDashboardOpen = isDashboardOpen;
-          });
-        },
+        ...createDashboardStore(...args),
       })),
       //   {
       //     name: "workspace-store",

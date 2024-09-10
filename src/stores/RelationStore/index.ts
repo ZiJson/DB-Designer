@@ -1,22 +1,35 @@
 import { Relation } from "@/types/Relation";
 import { ImmerStateCreator } from "../workspace-store";
 import { Coordinates } from "@dnd-kit/core/dist/types";
+import { start } from "repl";
+import { toast } from "sonner";
 
 type RelationState = {
   relations: Relation[];
+  connectingNode: {
+    tableId: string;
+    fieldId: string;
+  } | null;
 };
 
 type RelationActions = {
   addRelation: (relation: Relation) => void;
-  getNodePosition: (tableId: number, fieldId: number) => Coordinates;
+  removeRelation: (tableId: string, fieldId?: string) => void;
+  getNodePosition: (tableId: string, fieldId: string) => Coordinates;
+  setConnectingNode: (tableId: string, fieldId: string) => void;
+  clearConnectingNode: () => void;
+  getAllNodes: () => {
+    tableId: string;
+    fieldId: string;
+    coordinates: Coordinates;
+  }[];
 };
 
 export type RelationStore = RelationState & RelationActions;
 
 const defaultInitState: RelationState = {
-  relations: [
-    { start: { tableId: 1, fieldId: 1 }, end: { tableId: 0, fieldId: 1 } },
-  ],
+  relations: [],
+  connectingNode: null,
 };
 
 export const createRelationStore: ImmerStateCreator<RelationStore> = (
@@ -24,25 +37,87 @@ export const createRelationStore: ImmerStateCreator<RelationStore> = (
   get,
 ) => ({
   ...defaultInitState,
-  addRelation: (relation: Relation) =>
+  addRelation: (relation: Relation) => {
     set((state) => {
+      if (relation.start.tableId === relation.end.tableId) {
+        toast.error("Relation is not valid");
+        return;
+      }
+      if (
+        state.relations.some(
+          (r) =>
+            (r.start.tableId === relation.start.tableId &&
+              r.start.fieldId === relation.start.fieldId &&
+              r.end.tableId === relation.end.tableId &&
+              r.end.fieldId === relation.end.fieldId) ||
+            (r.start.tableId === relation.end.tableId &&
+              r.start.fieldId === relation.end.fieldId &&
+              r.end.tableId === relation.start.tableId &&
+              r.end.fieldId === relation.start.fieldId),
+        )
+      ) {
+        toast.error("Relation is exist");
+        return;
+      }
       state.relations.push(relation);
-    }),
-  getNodePosition: (tableId: number, fieldId: number) => {
-    // const table = get().tables.find((table) => table.id === tableId);
-    // if (!table) return { x: 0, y: 0 };
-    // const fieldIndex = table.fields.findIndex((field) => field.id === fieldId);
-    // return {
-    //   x: table.position.x + 144,
-    //   y: table.position.y + 53 + (fieldIndex + 1) * 33,
-    // };
-    const node = document.getElementById(`${tableId}-${fieldId}`);
-    if (!node) return { x: 0, y: 0 };
-    const rect = node.getBoundingClientRect();
-    const canvasPosition = get().position;
+    });
+    get().addFieldRelation(
+      relation.start.tableId,
+      relation.start.fieldId,
+      relation.end.tableId,
+      relation.end.fieldId,
+    );
+  },
+  getNodePosition: (tableId: string, fieldId: string) => {
+    const table = get().tables.find((table) => table.id === tableId);
+    if (!table) return { x: 0, y: 0 };
+    const transform = table.transform;
+    const fieldIndex = table.fields.findIndex((field) => field.id === fieldId);
     return {
-      x: rect.left - canvasPosition.x,
-      y: rect.top - canvasPosition.y,
+      x: table.position.x + transform.x + 144,
+      y: table.position.y + transform.y + 53 + fieldIndex * 33,
     };
   },
+  setConnectingNode: (tableId: string, fieldId: string) =>
+    set((state) => {
+      state.connectingNode = { tableId, fieldId };
+    }),
+  clearConnectingNode: () =>
+    set((state) => {
+      state.connectingNode = null;
+    }),
+  getAllNodes: () => {
+    const nodes: {
+      tableId: string;
+      fieldId: string;
+      coordinates: Coordinates;
+    }[] = [];
+    const tables = get().tables;
+    tables.forEach((table) => {
+      table.fields.forEach((field) => {
+        nodes.push({
+          tableId: table.id,
+          fieldId: field.id,
+          coordinates: get().getNodePosition(table.id, field.id),
+        });
+      });
+    });
+    return nodes;
+  },
+  removeRelation: (tableId: string, fieldId?: string) =>
+    set((state) => {
+      if (fieldId) {
+        state.relations = state.relations.filter(
+          (r) =>
+            !(
+              (r.start.tableId === tableId && r.start.fieldId === fieldId) ||
+              (r.end.tableId === tableId && r.end.fieldId === fieldId)
+            ),
+        );
+      } else {
+        state.relations = state.relations.filter(
+          (r) => !(r.start.tableId === tableId || r.end.tableId === tableId),
+        );
+      }
+    }),
 });

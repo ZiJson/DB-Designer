@@ -3,7 +3,7 @@ import { Bolt, ListPlus } from "lucide-react";
 import * as Sheet from "../Sheets";
 
 interface DrawerProps {
-  tableId: number;
+  tableId: string;
 }
 const Drawer = ({ tableId }: DrawerProps) => {
   const setIsDashboardOpen = useWorkspaceStore(

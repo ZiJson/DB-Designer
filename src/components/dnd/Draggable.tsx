@@ -13,7 +13,7 @@ interface Props {
   onDragEnd?: (event: DragEndEvent) => void;
   onDragStart?: (event: DragEndEvent) => void;
   onDragMove?: (event: DragEndEvent) => void;
-  setTransform?: (transform: Coordinates | null) => void;
+  isTransform?: boolean;
   className?: string;
   disabled?: boolean;
 }
@@ -22,7 +22,7 @@ function Draggable({
   onDragEnd,
   onDragStart,
   onDragMove,
-  setTransform,
+  isTransform = true,
   draggableId,
   children,
   className,
@@ -36,14 +36,7 @@ function Draggable({
       disabled,
     });
 
-  useEffect(() => {
-    if (!setTransform) return;
-    transform
-      ? setTransform({ x: transform.x, y: transform.y })
-      : setTransform(null);
-  }, [transform, setTransform]);
-
-  const transformStyle = !setTransform &&
+  const transformStyle = isTransform &&
     transform && {
       transform: `translate3d(${transform.x / scale}px, ${transform.y / scale}px, 0)`,
     };
@@ -54,7 +47,9 @@ function Draggable({
       {...listeners}
       {...attributes}
       style={{ ...transformStyle }}
-      className={`${className} ${isDragging ? "cursor-grabbing" : ""}`}
+      className={`${className} fixed ${
+        isDragging ? "cursor-grabbing" : "cursor-default"
+      }`}
     >
       {children}
     </div>

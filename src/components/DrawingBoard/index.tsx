@@ -4,28 +4,22 @@ import { useWorkspaceStore } from "@/providers/workspace-store-provider";
 import TableModal from "../TableModal";
 import ConnectLine from "./ConnectLine";
 import { getConnectMode } from "@/lib/tools";
-import {
-  DndContext,
-  MouseSensor,
-  useDndMonitor,
-  useDraggable,
-  useSensor,
-  useSensors,
-} from "@dnd-kit/core";
+import { DndContext, MouseSensor, useSensor, useSensors } from "@dnd-kit/core";
+import ConnectingLine from "./ConnectingLine";
 
 const DrawingBoard = () => {
-  const [isItemDragging, setIsItemDragging] = useState(false);
   const tables = useWorkspaceStore((state) => state.tables);
   const relations = useWorkspaceStore((state) => state.relations);
   const getNodePosition = useWorkspaceStore((state) => state.getNodePosition);
+  const connectingNode = useWorkspaceStore((state) => state.connectingNode);
   const sensors = useSensors(
     useSensor(MouseSensor, {
-      activationConstraint: { delay: 200, tolerance: 100, distance: 8 },
+      activationConstraint: { delay: 200, tolerance: 1000, distance: 8 },
     }),
   );
   return (
     <DndContext sensors={sensors}>
-      <Canvas isItemDragging={isItemDragging}>
+      <Canvas>
         {tables.map((table) => (
           <TableModal key={table.id} tableData={table} />
         ))}
@@ -43,6 +37,7 @@ const DrawingBoard = () => {
           }
           return <ConnectLine key={index} {...getConnectMode(start, end)} />;
         })}
+        {connectingNode && <ConnectingLine />}
       </Canvas>
     </DndContext>
   );

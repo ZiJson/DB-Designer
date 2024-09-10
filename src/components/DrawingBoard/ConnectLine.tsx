@@ -33,7 +33,9 @@ const ConnectLine = ({
       width={width + minLength + 4}
       height={height + strokeWidth}
       viewBox={viewBox}
-      className="absolute"
+      className={`absolute ${
+        mode === CONNECT_MODE.STRAIGHT ? "z-10" : "-z-10"
+      }`}
       style={positionStyle}
     >
       {path.toComponent({

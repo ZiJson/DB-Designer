@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { DragEndEvent } from "@dnd-kit/core";
+import { DragEndEvent, useDraggable } from "@dnd-kit/core";
 import { useWorkspaceStore } from "@/providers/workspace-store-provider";
 import Draggable from "../dnd/Draggable";
 import { Coordinates } from "@dnd-kit/core/dist/types";
@@ -9,17 +9,18 @@ const canvasId = "canvas";
 
 interface Props {
   children?: React.ReactNode;
-  isItemDragging: boolean;
 }
-const Canvas = ({ children, isItemDragging }: Props) => {
+const Canvas = ({ children }: Props) => {
   const position = useWorkspaceStore((state) => state.position);
   const setPosition = useWorkspaceStore((state) => state.setCanvasPosition);
   const scale = useWorkspaceStore((state) => state.scale);
   const setScale = useWorkspaceStore((state) => state.setScale);
-  const [transform, setTransform] = useState<Coordinates | null>(null);
 
+  const { isDragging, transform } = useDraggable({
+    id: canvasId,
+  });
   const onDragEnd = (event: DragEndEvent) => {
-    if (isItemDragging || event.active.id !== canvasId) return;
+    if (event.active.id !== canvasId) return;
     const { x, y } = event.delta;
     setPosition({
       x: position.x + x,
@@ -53,8 +54,7 @@ const Canvas = ({ children, isItemDragging }: Props) => {
       <Draggable
         draggableId={canvasId}
         onDragEnd={onDragEnd}
-        setTransform={setTransform}
-        disabled={isItemDragging}
+        isTransform={false}
         className="absolute inset-0 h-full w-full overflow-hidden bg-white bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:20px_20px]"
       >
         <div

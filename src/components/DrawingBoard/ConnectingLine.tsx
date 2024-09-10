@@ -4,21 +4,28 @@ import Path, { Svg } from "react-svg-path";
 import ConnectLine, { CONNECT_MODE } from "./ConnectLine";
 import { useWorkspaceStore } from "@/providers/workspace-store-provider";
 import { getCloserPoint } from "@/lib/tools";
+import { shallow } from "zustand/shallow";
 
 const ConnectingLine = () => {
-  const connectedNodeIdRef = useRef<number | null>(null);
-  const canvasScale = useWorkspaceStore((state) => state.canvas.scale);
-  const nodes = useWorkspaceStore((state) => state.nodes);
-  const addLine = useWorkspaceStore((state) => state.addLine);
-  const setIsConnecting = useWorkspaceStore((state) => state.setConnectingNode);
-  const connectingNode = useWorkspaceStore((state) => state.connectingNode);
-  const canvasPosition = useWorkspaceStore((state) => state.canvas.position);
-  const fixedPoints: Coordinates = nodes.find(
-    (node) => node.id === connectingNode,
-  )?.coordinates || { x: 0, y: 0 };
-  const [mousePosition, setMousePosition] = useState<Coordinates>(fixedPoints);
-  const otherNodes = nodes.filter((node) => node.id !== connectingNode);
-
+  const canvasPosition = useWorkspaceStore((state) => state.position);
+  const canvasScale = useWorkspaceStore((state) => state.scale);
+  const connectingNode = useWorkspaceStore((state) => state.connectingNode)!;
+  const getNodePosition = useWorkspaceStore((state) => state.getNodePosition);
+  const addRelation = useWorkspaceStore((state) => state.addRelation);
+  const clearConnectingNode = useWorkspaceStore(
+    (state) => state.clearConnectingNode,
+  );
+  const connectedNodeIdRef = useRef<{
+    tableId: string;
+    fieldId: string;
+    coordinates: Coordinates;
+  } | null>(null);
+  const allNodes = useWorkspaceStore((state) => state.getAllNodes(), shallow);
+  const fixedPoint = getNodePosition(
+    connectingNode.tableId,
+    connectingNode.fieldId,
+  );
+  const [mousePosition, setMousePosition] = useState<Coordinates>(fixedPoint);
   useEffect(() => {
     const handleMouseMove = (event: MouseEvent) => {
       const rect = canvasPosition;
@@ -26,22 +33,21 @@ const ConnectingLine = () => {
       const mouseY = (event.clientY - rect.y) / canvasScale;
       const closestPointIndex = getCloserPoint(
         { x: mouseX, y: mouseY },
-        otherNodes.map((node) => node.coordinates),
+        allNodes.map((node) => node.coordinates),
         20,
       );
-
       setMousePosition(
         closestPointIndex !== null
-          ? otherNodes[closestPointIndex].coordinates
+          ? allNodes[closestPointIndex].coordinates
           : { x: mouseX, y: mouseY },
       );
 
       connectedNodeIdRef.current =
-        closestPointIndex !== null ? otherNodes[closestPointIndex].id : null;
+        closestPointIndex !== null ? allNodes[closestPointIndex] : null;
     };
     window.addEventListener("mousemove", handleMouseMove, { capture: true });
     return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, [canvasScale, otherNodes, nodes, canvasPosition]);
+  }, [canvasScale, canvasPosition]);
 
   useEffect(() => {
     document.body.style.cursor = "grabbing";
@@ -51,16 +57,43 @@ const ConnectingLine = () => {
   }, [connectingNode]);
 
   const onMouseUp = () => {
-    setIsConnecting(null);
     connectedNodeIdRef.current &&
       connectingNode &&
-      addLine(connectingNode, connectedNodeIdRef.current);
+      addRelation({
+        start: {
+          ...connectingNode,
+        },
+        end: {
+          tableId: connectedNodeIdRef.current.tableId,
+          fieldId: connectedNodeIdRef.current.fieldId,
+        },
+      });
+    clearConnectingNode();
   };
 
+  useEffect(() => {
+    const MouseUpHandler = (event: MouseEvent) => {
+      connectedNodeIdRef.current &&
+        connectingNode &&
+        addRelation({
+          start: {
+            ...connectingNode,
+          },
+          end: {
+            tableId: connectedNodeIdRef.current.tableId,
+            fieldId: connectedNodeIdRef.current.fieldId,
+          },
+        });
+      clearConnectingNode();
+    };
+    window.addEventListener("mouseup", MouseUpHandler);
+    return () => window.removeEventListener("mouseup", MouseUpHandler);
+  }, []);
+
   return (
-    <div onMouseUp={onMouseUp}>
+    <div>
       <ConnectLine
-        p1={fixedPoints}
+        p1={fixedPoint}
         p2={mousePosition}
         mode={CONNECT_MODE.STRAIGHT}
       />

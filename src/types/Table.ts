@@ -2,14 +2,15 @@ import { Coordinates } from "@dnd-kit/core/dist/types";
 import { FiledTypes } from "./FieldTypes";
 
 export type TableModal = {
-  id: number;
+  id: string;
   name: string;
   fields: Field[];
   position: Coordinates;
+  transform: Coordinates;
 };
 
 export type Field = {
-  id: number;
+  id: string;
   name: string;
   defaultValue: string | null;
 } & FiledTypes &
@@ -28,8 +29,8 @@ export enum ToggleType {
 }
 
 export type FieldRelation = {
-  relation?: {
-    tableId: number;
-    fieldId: number;
-  };
+  relations: {
+    tableId: string;
+    fieldId: string;
+  }[];
 };

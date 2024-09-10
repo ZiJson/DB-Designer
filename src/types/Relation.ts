@@ -1,10 +1,10 @@
 export type Relation = {
   start: {
-    tableId: number;
-    fieldId: number;
+    tableId: string;
+    fieldId: string;
   };
   end: {
-    tableId: number;
-    fieldId: number;
+    tableId: string;
+    fieldId: string;
   };
 };
