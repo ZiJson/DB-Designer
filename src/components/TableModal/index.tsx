@@ -97,20 +97,11 @@ const TableModal = ({ tableData }: Props) => {
         <div className="divide-y divide-solid">
           {tableData.fields.map((field, index) => (
             <div key={field.name}>
-              <HoverCard openDelay={400}>
-                <HoverCardTrigger>
-                  <FieldRow field={field} tableId={tableData.id} />
-                </HoverCardTrigger>
-                {!isDragging && (
-                  <HoverCardContent side="left" sideOffset={10} align="start">
-                    <FieldInfoCard field={field} />
-                  </HoverCardContent>
-                )}
-              </HoverCard>
+              <FieldRow field={field} tableId={tableData.id} />
             </div>
           ))}
         </div>
-        <Drawer tableId={tableData.id} />
+        {/* <Drawer tableId={tableData.id} /> */}
       </div>
     </Draggable>
   );

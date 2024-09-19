@@ -7,11 +7,7 @@ const FieldInfoCard = ({ field }: { field: Field }) => {
       <div className="mb-2 flex items-baseline justify-between gap-1">
         <p className="scroll-m-20 text-xl font-semibold tracking-tight">
           {field.name}
-          <span className="ml-1 text-sm text-muted-foreground">
-            #{field.id}
-          </span>
         </p>
-
         <p className="text-slate-400">{field.type}</p>
       </div>
       <div className="flex flex-wrap gap-2">

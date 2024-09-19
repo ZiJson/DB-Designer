@@ -38,27 +38,35 @@ export const createRelationStore: ImmerStateCreator<RelationStore> = (
 ) => ({
   ...defaultInitState,
   addRelation: (relation: Relation) => {
+    if (relation.start.tableId === relation.end.tableId) {
+      toast.error("You can't create relation to the same table");
+      return;
+    }
+    const startField = get()
+      .tables.find((table) => table.id === relation.start.tableId)
+      ?.fields.find((field) => field.id === relation.start.fieldId);
+    const endField = get()
+      .tables.find((table) => table.id === relation.end.tableId)
+      ?.fields.find((field) => field.id === relation.end.fieldId);
+    if (!startField || !endField) {
+      toast.error("Field not found");
+      return;
+    }
+    if (startField.type !== endField.type) {
+      toast.error("Field types are different");
+      return;
+    }
+    if (
+      startField.relations.some(
+        (r) =>
+          r.tableId === relation.end.tableId &&
+          r.fieldId === relation.end.fieldId,
+      )
+    ) {
+      toast.error("Relation is exist");
+      return;
+    }
     set((state) => {
-      if (relation.start.tableId === relation.end.tableId) {
-        toast.error("Relation is not valid");
-        return;
-      }
-      if (
-        state.relations.some(
-          (r) =>
-            (r.start.tableId === relation.start.tableId &&
-              r.start.fieldId === relation.start.fieldId &&
-              r.end.tableId === relation.end.tableId &&
-              r.end.fieldId === relation.end.fieldId) ||
-            (r.start.tableId === relation.end.tableId &&
-              r.start.fieldId === relation.end.fieldId &&
-              r.end.tableId === relation.start.tableId &&
-              r.end.fieldId === relation.start.fieldId),
-        )
-      ) {
-        toast.error("Relation is exist");
-        return;
-      }
       state.relations.push(relation);
     });
     get().addFieldRelation(
@@ -72,7 +80,14 @@ export const createRelationStore: ImmerStateCreator<RelationStore> = (
     const table = get().tables.find((table) => table.id === tableId);
     if (!table) return { x: 0, y: 0 };
     const transform = table.transform;
-    const fieldIndex = table.fields.findIndex((field) => field.id === fieldId);
+    let fieldIndex = 0;
+    for (const field of table.fields) {
+      if (field.id === fieldId) {
+        break;
+      }
+      fieldIndex += field.relations.length;
+      fieldIndex++;
+    }
     return {
       x: table.position.x + transform.x + 144,
       y: table.position.y + transform.y + 53 + fieldIndex * 33,

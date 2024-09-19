@@ -32,5 +32,8 @@ export type FieldRelation = {
   relations: {
     tableId: string;
     fieldId: string;
+    name: string;
+    [ToggleType.Array]: boolean;
+    [ToggleType.Nullable]: boolean;
   }[];
 };

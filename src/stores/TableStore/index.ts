@@ -10,6 +10,7 @@ type TableState = {
 };
 
 type TableActions = {
+  clearAll: () => void;
   addNewTable: () => void;
   updateTable: (table: TableModal) => void;
   updateTablePosition: (tableId: string, position: Coordinates) => void;
@@ -57,15 +58,28 @@ const defaultField: Field = {
   relations: [],
 };
 
-export const createTableStore: ImmerStateCreator<TableStore> = (set, get) => ({
+export const createTableStore: ImmerStateCreator<TableStore> = (
+  set,
+  get,
+  store,
+) => ({
   ...defaultInitState,
+  clearAll: () => {
+    set((state) => {
+      state.tables = [];
+      state.relations = [];
+      state.connectingNode = null;
+      state.isDashboardOpen = false;
+      state.activeTableId = null;
+    });
+  },
   addNewTable: () => {
     const id = uuidv4();
     set((state) => {
       state.tables.push({
         ...defaultTable,
         id,
-        name: `Table ${state.tables.length}`,
+        name: `Table${state.tables.length}`,
         position: {
           x: (-state.position.x + 100) / state.scale,
           y: (-state.position.y + 20) / state.scale,
@@ -117,7 +131,6 @@ export const createTableStore: ImmerStateCreator<TableStore> = (set, get) => ({
     });
   },
   updateField: (tableId: string, field: Field) => {
-    console.log(field);
     set((state) => {
       state.tables = state.tables.map((t) => {
         if (t.id === tableId) {
@@ -163,14 +176,25 @@ export const createTableStore: ImmerStateCreator<TableStore> = (set, get) => ({
         const field1 = table1.fields.find((f) => f.id === fieldId1);
         const field2 = table2.fields.find((f) => f.id === fieldId2);
         if (field1 && field2) {
-          // 使用不可变更新方式
           field1.relations = [
             ...field1.relations,
-            { tableId: tableId2, fieldId: fieldId2 },
+            {
+              tableId: tableId2,
+              fieldId: fieldId2,
+              name: table2.name.toLowerCase(),
+              toArray: false,
+              nullable: false,
+            },
           ];
           field2.relations = [
             ...field2.relations,
-            { tableId: tableId1, fieldId: fieldId1 },
+            {
+              tableId: tableId1,
+              fieldId: fieldId1,
+              name: table1.name.toLowerCase(),
+              toArray: false,
+              nullable: false,
+            },
           ];
         }
       }

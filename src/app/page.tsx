@@ -6,16 +6,17 @@ import DrawingBoard from "@/components/DrawingBoard";
 
 const Page = () => {
   const addNewTable = useWorkspaceStore((state) => state.addNewTable);
+  const clearAll = useWorkspaceStore((state) => state.clearAll);
   return (
     <div>
       <DrawingBoard />
       <DashBoard />
-      <Button
-        onClick={addNewTable}
-        className="absolute right-[50%] top-5 translate-x-[50%]"
-      >
-        New Table
-      </Button>
+      <div className="absolute right-[50%] top-5 flex translate-x-[50%] gap-3">
+        <Button onClick={addNewTable}>New Table</Button>
+        <Button onClick={clearAll} variant="destructive">
+          Reset
+        </Button>
+      </div>
     </div>
   );
 };

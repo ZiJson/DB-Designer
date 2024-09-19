@@ -24,18 +24,18 @@ export const createWorkspaceStore = (
 ) => {
   return createStore<WorkspaceStore>()(
     devtools(
-      // persist(
-      immer((...args) => ({
-        ...initState,
-        ...createCanvasStore(...args),
-        ...createTableStore(...args),
-        ...createRelationStore(...args),
-        ...createDashboardStore(...args),
-      })),
-      //   {
-      //     name: "workspace-store",
-      //   },
-      // ),
+      persist(
+        immer((...args) => ({
+          ...initState,
+          ...createCanvasStore(...args),
+          ...createTableStore(...args),
+          ...createRelationStore(...args),
+          ...createDashboardStore(...args),
+        })),
+        {
+          name: "workspace-store",
+        },
+      ),
     ),
   );
 };
