@@ -22,10 +22,12 @@ const CustomToggle = ({
   return (
     <TooltipProvider>
       <Tooltip delayDuration={300}>
-        <TooltipTrigger>
-          <Toggle pressed={pressed} onPressedChange={onPressedChange}>
-            <ToggleIcon toggleKey={toggleKey} className="h-4 w-4" />
-          </Toggle>
+        <TooltipTrigger asChild>
+          <div>
+            <Toggle pressed={pressed} onPressedChange={onPressedChange}>
+              <ToggleIcon toggleKey={toggleKey} className="h-4 w-4" />
+            </Toggle>
+          </div>
         </TooltipTrigger>
         <TooltipContent>
           <p>{tooltipContent}</p>

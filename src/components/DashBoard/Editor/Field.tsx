@@ -64,13 +64,6 @@ const Field = ({
           </SelectContent>
         </Select>
       </div>
-      {/* <Button
-        variant="destructive"
-        size="icon"
-        className="col-span-1 justify-self-end"
-      >
-        <Trash className="h-4 w-4" />
-      </Button> */}
       <div className="col-span-3 flex justify-start gap-1">
         {Object.keys(toggleRest).map((item) => (
           <CustomToggle

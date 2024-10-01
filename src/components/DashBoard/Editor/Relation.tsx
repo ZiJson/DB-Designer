@@ -78,7 +78,7 @@ const Relation = ({ relation, field, tableId }: Props) => {
           />
         ))}
       </div>
-      <p className="col-span-3 text-sm">
+      <div className="col-span-3 text-sm">
         reference:{" "}
         <Badge className="rounded-md" variant="secondary">
           {targetTable.name}
@@ -87,7 +87,7 @@ const Relation = ({ relation, field, tableId }: Props) => {
         <Badge className="rounded-md" variant="secondary">
           {targetField.name}
         </Badge>
-      </p>
+      </div>
     </div>
   );
 };

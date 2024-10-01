@@ -11,9 +11,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FieldTypes } from "@/types/FieldTypes";
 import { useWorkspaceStore } from "@/providers/workspace-store-provider";
-import {
+import React, {
   FocusEvent,
   FormEvent,
+  Fragment,
   memo,
   useCallback,
   useMemo,
@@ -50,7 +51,7 @@ const Table = ({ table }: Props) => {
       if (!oldField) return;
       updateField(table.id, { ...oldField, name: e.target.value });
     },
-    [updateField],
+    [updateField, table.id, table.fields],
   );
 
   const onTableNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -89,7 +90,7 @@ const Table = ({ table }: Props) => {
       </CardHeader>
       <CardContent className="grid gap-2">
         {table.fields.map((field) => (
-          <>
+          <Fragment key={field.id}>
             <FieldEditor
               key={field.id}
               field={field}
@@ -105,7 +106,7 @@ const Table = ({ table }: Props) => {
                   field={field}
                 />
               ))}
-          </>
+          </Fragment>
         ))}
       </CardContent>
       <CardFooter>
