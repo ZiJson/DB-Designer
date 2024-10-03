@@ -1,7 +1,8 @@
 import { Field, FieldToggle, ToggleType } from "@/types/Table";
 import { Badge } from "@/components/ui/badge";
+import { FieldAttributes, ModelField } from "@/types/Database";
 
-const FieldInfoCard = ({ field }: { field: Field }) => {
+const FieldInfoCard = ({ field }: { field: ModelField }) => {
   return (
     <div>
       <div className="mb-2 flex items-baseline justify-between gap-1">
@@ -11,7 +12,7 @@ const FieldInfoCard = ({ field }: { field: Field }) => {
         <p className="text-slate-400">{field.type}</p>
       </div>
       <div className="flex flex-wrap gap-2">
-        {Object.values(ToggleType).map((t) => (
+        {Object.values(FieldAttributes).map((t) => (
           <Badge
             key={t}
             className="pt-1"

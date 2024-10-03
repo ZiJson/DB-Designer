@@ -1,29 +1,28 @@
-import { useRef, useState } from "react";
+"use client";
 import Canvas from "./Canvas";
 import { useWorkspaceStore } from "@/providers/workspace-store-provider";
 import TableModal from "../TableModal";
-import ConnectLine from "./ConnectLine";
+import ConnectLine, { CONNECT_MODE } from "./ConnectLine";
 import { getConnectMode } from "@/lib/tools";
 import { DndContext, MouseSensor, useSensor, useSensors } from "@dnd-kit/core";
 import ConnectingLine from "./ConnectingLine";
 
 const DrawingBoard = () => {
-  const tables = useWorkspaceStore((state) => state.tables);
-  const relations = useWorkspaceStore((state) => state.relations);
-  const getNodePosition = useWorkspaceStore((state) => state.getNodePosition);
-  const connectingNode = useWorkspaceStore((state) => state.connectingNode);
+  // const relations = useWorkspaceStore((state) => state.relations);
+  // const getNodePosition = useWorkspaceStore((state) => state.getNodePosition);
+  // const connectingNode = useWorkspaceStore((state) => state.connectingNode);
   const sensors = useSensors(
     useSensor(MouseSensor, {
-      activationConstraint: { delay: 200, tolerance: 1000, distance: 8 },
+      activationConstraint: { delay: 100, tolerance: 1000, distance: 10 },
     }),
   );
+
   return (
     <DndContext sensors={sensors}>
       <Canvas>
-        {tables.map((table) => (
-          <TableModal key={table.id} tableData={table} />
-        ))}
-        {relations.map((relation, index) => {
+        <Lines />
+        <Models />
+        {/* {relations.map((relation, index) => {
           const start = getNodePosition(
             relation.start.tableId,
             relation.start.fieldId,
@@ -36,11 +35,85 @@ const DrawingBoard = () => {
             return null;
           }
           return <ConnectLine key={index} {...getConnectMode(start, end)} />;
-        })}
-        {connectingNode && <ConnectingLine />}
+        })} */}
+        {/* {connectingNode && <ConnectingLine />} */}
       </Canvas>
     </DndContext>
   );
 };
 
 export default DrawingBoard;
+
+const Models = () => {
+  const tables = useWorkspaceStore(
+    (state) => state.tables,
+    (prev, curr) => prev.length === curr.length,
+  );
+  return (
+    <>
+      {tables.map((table) => (
+        <TableModal key={table.name} tableData={table} />
+      ))}
+    </>
+  );
+};
+
+const Lines = () => {
+  const tables = useWorkspaceStore((state) => state.tables);
+
+  const findPositionAndWidth = (tableName: string, fieldName?: string) => {
+    const ModelElement = document.getElementById(tableName);
+    const table = tables.find((table) => table.name === tableName)!;
+    const fieldIndex = table.fields.findIndex(
+      (field) => field.name === fieldName,
+    );
+    return {
+      x: table.position.x,
+      y: table.position.y + 18.5 + (fieldIndex < 0 ? 0 : (fieldIndex + 1) * 37),
+      width: ModelElement?.offsetWidth || 0,
+    };
+  };
+
+  const relations = tables.flatMap((table) =>
+    table.fields
+      .filter(
+        (field) => field.kind === "object" && !field.relationFromFields?.length,
+      )
+      .map((field) => {
+        return {
+          from: [field.type],
+          to: [table.name, field.name],
+          name: field.relationName,
+        };
+      }),
+  );
+
+  return relations.map((relation, index) => {
+    let node1 = findPositionAndWidth(relation.from[0], relation.from[1]);
+    let node2 = findPositionAndWidth(relation.to[0], relation.to[1]);
+    const mode =
+      Math.abs(node1.x - node2.x) > Math.max(node1.width, node2.width) + 50
+        ? CONNECT_MODE.OPPOSITE_SIDE
+        : CONNECT_MODE.SAME_SIDE;
+
+    if (mode === CONNECT_MODE.OPPOSITE_SIDE) {
+      if (node1.x > node2.x) {
+        node2.x += node2.width;
+      } else {
+        node1.x += node1.width;
+      }
+    } else {
+      node1.x += node1.width;
+      node2.x += node2.width;
+    }
+    return (
+      <ConnectLine
+        key={index}
+        p1={node1}
+        p2={node2}
+        mode={mode}
+        title={relation.name}
+      />
+    );
+  });
+};

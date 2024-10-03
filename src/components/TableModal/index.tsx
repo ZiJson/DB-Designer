@@ -18,93 +18,90 @@ import {
   useDraggable,
 } from "@dnd-kit/core";
 import { shallow } from "zustand/shallow";
-import { useRef, useState } from "react";
+import { memo, ReactEventHandler, useRef, useState } from "react";
 import { Coordinates } from "@dnd-kit/core/dist/types";
+import { Model, ModelField } from "@/types/Database";
+import next from "next";
+import { DataTable } from "../CustomUI";
+import { ColumnDef } from "@tanstack/react-table";
 
 interface Props {
-  tableData: TableModal;
+  tableData: Model;
 }
 const TableModal = ({ tableData }: Props) => {
-  const [transform, setTransform] = useState<Coordinates | null>(null);
-  const setActiveTableId = useWorkspaceStore((state) => state.setActiveTableId);
+  const startPosition = useRef<Coordinates | null>(null);
   const updateTablePosition = useWorkspaceStore(
     (state) => state.updateTablePosition,
   );
   const removeTable = useWorkspaceStore((state) => state.removeTable);
-  const updateTableTransform = useWorkspaceStore(
-    (state) => state.updateTableTransform,
-  );
   const scale = useWorkspaceStore((state) => state.scale);
   const position = useWorkspaceStore(
-    (state) =>
-      state.tables.find((table) => table.id === tableData.id)!.position,
-    shallow,
+    (state) => state.tables.find((t) => t.name === tableData.name)!.position,
   );
 
   const onDragMove = (event: DragMoveEvent) => {
-    if (event.active.id !== tableData.id.toString()) return;
+    if (event.active.id !== tableData.name || !startPosition.current) return;
     const { x, y } = event.delta;
-    updateTableTransform(tableData.id, {
-      x: x,
-      y: y,
+    updateTablePosition(tableData.name, {
+      x: startPosition.current.x + x / scale,
+      y: startPosition.current.y + y / scale,
     });
   };
 
-  const onDragEnd = (event: DragEndEvent) => {
-    if (event.active.id !== tableData.id.toString()) return;
-
-    const { x, y } = event.delta;
-    updateTableTransform(tableData.id, {
-      x: 0,
-      y: 0,
-    });
-    updateTablePosition(tableData.id, {
-      x: x / scale + position.x,
-      y: y / scale + position.y,
-    });
+  const onDragStart = (event: DragStartEvent) => {
+    if (event.active.id !== tableData.name) return;
+    startPosition.current = position;
   };
 
-  const onRemove = () => {
-    removeTable(tableData.id);
+  const onRemove = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    removeTable(tableData.name);
   };
   const positionStyle = {
     top: position.y,
     left: position.x,
   };
   const { isDragging } = useDraggable({
-    id: tableData.id.toString(),
+    id: tableData.name,
   });
+
   return (
     <Draggable
-      draggableId={tableData.id.toString()}
-      onDragEnd={onDragEnd}
+      draggableId={tableData.name}
+      isTransform={false}
       onDragMove={onDragMove}
+      onDragStart={onDragStart}
     >
-      <div
-        className={`group absolute h-fit w-36 rounded-lg border-2 border-slate-500 bg-white ${
-          isDragging ? "scale-105 shadow-lg transition-all" : ""
+      <DataTable
+        columns={columns}
+        data={tableData.fields}
+        title={tableData.name}
+        className={`group absolute z-20 bg-white transition-transform ${
+          isDragging ? "scale-105 shadow-md" : ""
         }`}
-        onClick={() => setActiveTableId(tableData.id)}
         style={positionStyle}
-      >
-        <div className="relative rounded-t-md border-b-2 border-slate-500 bg-slate-100 px-3 py-1 font-semibold">
-          <X
-            className="absolute right-1 cursor-pointer text-slate-500 hover:text-slate-900"
-            onClick={onRemove}
-          />
-          {tableData.name}
-        </div>
-        <div className="divide-y divide-solid">
-          {tableData.fields.map((field, index) => (
-            <div key={field.name}>
-              <FieldRow field={field} tableId={tableData.id} />
-            </div>
-          ))}
-        </div>
-        {/* <Drawer tableId={tableData.id} /> */}
-      </div>
+      />
     </Draggable>
   );
 };
 
-export default TableModal;
+export default memo(TableModal);
+
+type FieldTableCol = {
+  name: string;
+  type: string;
+};
+
+export const columns: ColumnDef<FieldTableCol, ModelField>[] = [
+  {
+    accessorKey: "name",
+  },
+  {
+    accessorKey: "type",
+    cell: (info) => {
+      const row = info.row.original as ModelField;
+      return `${row.type}${row.isList ? "[]" : ""}${row.isRequired ? "" : "?"}`;
+    },
+  },
+];

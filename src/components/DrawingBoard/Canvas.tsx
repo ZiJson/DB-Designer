@@ -50,7 +50,7 @@ const Canvas = ({ children }: Props) => {
       : `scale(${scale})`,
   };
   return (
-    <div onWheel={onWheel}>
+    <div onWheel={onWheel} className="relative h-screen w-screen">
       <Draggable
         draggableId={canvasId}
         onDragEnd={onDragEnd}
@@ -60,7 +60,7 @@ const Canvas = ({ children }: Props) => {
         <div
           style={{ ...positionStyle, ...transformStyle }}
           id="canvas"
-          className="fixed h-8 w-8 border-4 border-b-0 border-r-0 border-solid border-slate-600"
+          className="absolute h-8 w-8 border-4 border-b-0 border-r-0 border-solid border-slate-600"
         >
           {children}
         </div>

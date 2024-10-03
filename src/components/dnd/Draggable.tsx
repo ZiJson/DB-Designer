@@ -49,7 +49,7 @@ function Draggable({
       style={{ ...transformStyle }}
       className={`${className} fixed ${
         isDragging ? "cursor-grabbing" : "cursor-default"
-      }`}
+      } `}
     >
       {children}
     </div>
