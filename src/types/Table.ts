@@ -1,5 +1,6 @@
 import { Coordinates } from "@dnd-kit/core/dist/types";
 import { FiledTypes } from "./FieldTypes";
+import { DMMF } from "@prisma/generator-helper";
 
 export type TableModal = {
   id: string;

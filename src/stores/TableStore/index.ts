@@ -1,16 +1,20 @@
-import { Field, TableModal } from "@/types/Table";
 import { ImmerStateCreator } from "../workspace-store";
-import { FieldTypes } from "@/types/FieldTypes";
 import { Coordinates } from "@dnd-kit/core/dist/types";
-import { v4 as uuidv4 } from "uuid";
 import { Model, ModelField, ScalarTypes } from "@/types/Database";
+import { DMMF, type ReadonlyDeep } from "@prisma/generator-helper";
+import { stat } from "fs";
+
+type MutableDeep<T> = {
+  -readonly [P in keyof T]: MutableDeep<T[P]>;
+};
 
 type TableState = {
-  tables: Model[];
+  tables: MutableDeep<DMMF.Model & { position: Coordinates }>[];
 };
 
 type TableActions = {
   updateTablePosition: (tableName: string, position: Coordinates) => void;
+  refreshTables: (models: DMMF.Document["datamodel"]["models"]) => void;
   addNewTable: () => void;
   removeTable: (tableName: string) => void;
 };
@@ -256,25 +260,14 @@ const defaultInitState: TableState = {
   ],
 };
 
-const defaultField: ModelField = {
-  name: "id",
-  kind: "scalar",
-  isList: false,
-  isRequired: false,
-  isUnique: false,
-  isId: true,
-  isReadOnly: false,
-  hasDefaultValue: false,
-  type: ScalarTypes.INT,
-  default: null,
-};
-
-const defaultTable: Model = {
-  name: "Table",
-  fields: [defaultField],
+const defaultModel: MutableDeep<DMMF.Model & { position: Coordinates }> = {
+  name: "",
+  dbName: null,
+  fields: [],
   primaryKey: null,
   uniqueFields: [],
   uniqueIndexes: [],
+  isGenerated: false,
   position: { x: 0, y: 0 },
 };
 
@@ -297,17 +290,31 @@ export const createTableStore: ImmerStateCreator<TableStore> = (
       });
     });
   },
-  addNewTable() {
+  addNewTable: () => {
     set((state) => {
-      state.tables = [
-        ...state.tables,
-        { ...defaultTable, name: `Table_${state.tables.length}` },
-      ];
+      state.tables.push(defaultModel);
     });
   },
   removeTable(tableName) {
     set((state) => {
       state.tables = state.tables.filter((table) => table.name !== tableName);
+    });
+  },
+  refreshTables(models) {
+    console.log(models, "models");
+    set((state) => {
+      state.tables = state.tables.map((table, index) => {
+        const model = models.find(
+          (m) => m.name === table.name,
+        ) as MutableDeep<DMMF.Model>;
+        if (model) {
+          return {
+            ...table,
+            ...model,
+          };
+        }
+        return table;
+      });
     });
   },
 });

@@ -1,36 +1,34 @@
 import React from "react";
 import CodeMirror, { ViewUpdate } from "@uiw/react-codemirror";
-import { keymap } from "@codemirror/view";
-import { indentWithTab } from "@codemirror/commands";
 import { StreamLanguage } from "@codemirror/language";
-import * as events from "@uiw/codemirror-extensions-events";
-import { element } from "@uiw/codemirror-extensions-events";
-
-const extension2 = events.content({
-  focus: (evn) => {
-    console.log("evn:", evn);
-  },
-  blur: (evn) => {
-    /* ... */
-  },
-});
+import { schemaToDmmf } from "@/serverActions/dmmf";
+import { linter, lintGutter, Diagnostic } from "@codemirror/lint";
+import { EditorView } from "@codemirror/view";
+import { prismaLinter } from "./linter";
+import { DMMF } from "@prisma/generator-helper";
+import { useWorkspaceStore } from "@/providers/workspace-store-provider";
 
 function CodeEditor() {
   const [value, setValue] = React.useState(defaultValue);
-  const onChange = React.useCallback((val: string, viewUpdate: ViewUpdate) => {
-    const { state } = viewUpdate;
-    const cursor = state.selection.main.head; // Gets the current cursor position
-    const line = state.doc.lineAt(cursor);
-    console.log("🚀 ~ line:", line);
-    setValue(val);
-  }, []);
+  const refreshTables = useWorkspaceStore((state) => state.refreshTables);
+  const onSuccess = (dmmf: DMMF.Document) => {
+    refreshTables(dmmf.datamodel.models);
+  };
+  const onChange = React.useCallback(
+    async (val: string, viewUpdate: ViewUpdate) => {
+      const { state } = viewUpdate;
+      const cursor = state.selection.main.head; // Gets the current cursor position
+      const line = state.doc.lineAt(cursor);
+      console.log(viewUpdate);
+      setValue(val);
+    },
+    [],
+  );
+
   return (
     <CodeMirror
       value={value}
-      onChange={onChange}
-      extensions={[prismaLang]}
-      onFocus={() => {}}
-      onUpdate={console.log}
+      extensions={[prismaLang, linter(prismaLinter(onSuccess)), lintGutter({})]}
     />
   );
 }

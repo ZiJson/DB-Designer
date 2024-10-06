@@ -11,6 +11,8 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
+import { schemaToDmmf } from "@/serverActions/dmmf";
+
 const Page = () => {
   const addNewTable = useWorkspaceStore((state) => state.addNewTable);
   const clearAll = useWorkspaceStore((state) => state.clearAll);

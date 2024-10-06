@@ -6,6 +6,7 @@ import ConnectLine, { CONNECT_MODE } from "./ConnectLine";
 import { getConnectMode } from "@/lib/tools";
 import { DndContext, MouseSensor, useSensor, useSensors } from "@dnd-kit/core";
 import ConnectingLine from "./ConnectingLine";
+import { useEffect, useState } from "react";
 
 const DrawingBoard = () => {
   // const relations = useWorkspaceStore((state) => state.relations);
@@ -45,10 +46,7 @@ const DrawingBoard = () => {
 export default DrawingBoard;
 
 const Models = () => {
-  const tables = useWorkspaceStore(
-    (state) => state.tables,
-    (prev, curr) => prev.length === curr.length,
-  );
+  const tables = useWorkspaceStore((state) => state.tables);
   return (
     <>
       {tables.map((table) => (
@@ -60,6 +58,15 @@ const Models = () => {
 
 const Lines = () => {
   const tables = useWorkspaceStore((state) => state.tables);
+  const [rerender, setRerender] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setRerender((pre) => !pre); // Trigger re-render after 100ms
+    }, 0);
+
+    return () => clearTimeout(timer); // Cleanup the timer when component unmounts
+  }, [tables]); // Empty dependency array ensures this runs only once on mount
 
   const findPositionAndWidth = (tableName: string, fieldName?: string) => {
     const ModelElement = document.getElementById(tableName);

@@ -1,4 +1,5 @@
 import { Coordinates } from "@dnd-kit/core/dist/types";
+import { DMMF } from "@prisma/generator-helper";
 
 export type EnumValue = {
   name: string;
