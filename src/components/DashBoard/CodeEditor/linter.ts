@@ -56,7 +56,7 @@ function splitPrismaErrors(rawError: string): {
   return errorLines.reduce(
     (acc: { message: string; lineNumber: number }[], line, index) => {
       if (line.includes("error:")) {
-        const message = line.split("error:")[1].trim();
+        const message = line.split("error:")[1];
         const lineNumber = +errorLines[index + 1].split("schema.prisma:")[1];
         acc.push({ message, lineNumber });
       }

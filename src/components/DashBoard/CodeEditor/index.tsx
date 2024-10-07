@@ -1,9 +1,9 @@
 import React from "react";
 import CodeMirror, { ViewUpdate } from "@uiw/react-codemirror";
 import { StreamLanguage } from "@codemirror/language";
-import { schemaToDmmf } from "@/serverActions/dmmf";
+import { prismaCompletion } from "./mention";
 import { linter, lintGutter, Diagnostic } from "@codemirror/lint";
-import { EditorView } from "@codemirror/view";
+import { autocompletion } from "@codemirror/autocomplete";
 import { prismaLinter } from "./linter";
 import { DMMF } from "@prisma/generator-helper";
 import { useWorkspaceStore } from "@/providers/workspace-store-provider";
@@ -14,21 +14,16 @@ function CodeEditor() {
   const onSuccess = (dmmf: DMMF.Document) => {
     refreshTables(dmmf.datamodel.models);
   };
-  const onChange = React.useCallback(
-    async (val: string, viewUpdate: ViewUpdate) => {
-      const { state } = viewUpdate;
-      const cursor = state.selection.main.head; // Gets the current cursor position
-      const line = state.doc.lineAt(cursor);
-      console.log(viewUpdate);
-      setValue(val);
-    },
-    [],
-  );
 
   return (
     <CodeMirror
       value={value}
-      extensions={[prismaLang, linter(prismaLinter(onSuccess)), lintGutter({})]}
+      extensions={[
+        prismaLang,
+        linter(prismaLinter(onSuccess)),
+        lintGutter({}),
+        autocompletion({ override: [prismaCompletion] }),
+      ]}
     />
   );
 }

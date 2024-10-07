@@ -29,7 +29,7 @@ const Page = () => {
         </ResizablePanel>
       </ResizablePanelGroup>
       <div className="absolute right-[50%] top-5 flex translate-x-[50%] gap-3">
-        <Button onClick={addNewTable}>New Table</Button>
+        {/* <Button onClick={addNewTable}>New Table</Button> */}
         {/* <Button onClick={clearAll} variant="destructive">
           Reset
         </Button>

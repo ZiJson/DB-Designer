@@ -1,6 +1,7 @@
 import { createStore, StateCreator } from "zustand/vanilla";
 import { devtools, persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
+import { enableMapSet } from "immer";
 import { CanvasStore, createCanvasStore } from "./CanvasStore";
 import { createTableStore, TableStore } from "./TableStore";
 import { createDashboardStore, DashboardStore } from "./Dashboard";
@@ -16,7 +17,6 @@ export type WorkspaceStore = WorkspaceState &
   DashboardStore;
 
 export const defaultInitState: WorkspaceState = {};
-
 export const createWorkspaceStore = (
   initState: WorkspaceState = defaultInitState,
 ) => {
@@ -37,6 +37,7 @@ export const createWorkspaceStore = (
   );
 };
 
+enableMapSet();
 export type ImmerStateCreator<T extends Partial<WorkspaceStore>> = StateCreator<
   WorkspaceStore,
   [["zustand/immer", never], never],

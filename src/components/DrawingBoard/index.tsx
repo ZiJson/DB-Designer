@@ -58,6 +58,7 @@ const Models = () => {
 
 const Lines = () => {
   const tables = useWorkspaceStore((state) => state.tables);
+  const positions = useWorkspaceStore((state) => state.positions);
   const [rerender, setRerender] = useState(false);
 
   useEffect(() => {
@@ -69,6 +70,7 @@ const Lines = () => {
   }, [tables]); // Empty dependency array ensures this runs only once on mount
 
   const findPositionAndWidth = (tableName: string, fieldName?: string) => {
+    const position = positions.get(tableName) || { x: 0, y: 0 };
     const ModelElement =
       typeof document !== "undefined"
         ? document.getElementById(tableName)
@@ -78,9 +80,9 @@ const Lines = () => {
       (field) => field.name === fieldName,
     );
     return {
-      x: table.position.x,
-      y: table.position.y + 18.5 + (fieldIndex < 0 ? 0 : (fieldIndex + 1) * 37),
-      width: ModelElement?.offsetWidth || 0,
+      x: position.x,
+      y: position.y + 18.5 + (fieldIndex < 0 ? 0 : (fieldIndex + 1) * 37),
+      width: ModelElement?.offsetWidth || 140,
     };
   };
 

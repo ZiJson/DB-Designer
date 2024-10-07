@@ -36,7 +36,7 @@ const TableModal = ({ tableData }: Props) => {
   const removeTable = useWorkspaceStore((state) => state.removeTable);
   const scale = useWorkspaceStore((state) => state.scale);
   const position = useWorkspaceStore(
-    (state) => state.tables.find((t) => t.name === tableData.name)!.position,
+    (state) => state.positions.get(tableData.name) || { x: 0, y: 0 },
   );
 
   const onDragMove = (event: DragMoveEvent) => {

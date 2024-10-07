@@ -2,14 +2,16 @@ import { ImmerStateCreator } from "../workspace-store";
 import { Coordinates } from "@dnd-kit/core/dist/types";
 import { Model, ModelField, ScalarTypes } from "@/types/Database";
 import { DMMF, type ReadonlyDeep } from "@prisma/generator-helper";
-import { stat } from "fs";
+import { v4 as uuid } from "uuid";
+import { UUID } from "crypto";
 
 export type MutableDeep<T> = {
   -readonly [P in keyof T]: MutableDeep<T[P]>;
 };
 
 type TableState = {
-  tables: MutableDeep<DMMF.Model & { position: Coordinates }>[];
+  tables: MutableDeep<DMMF.Model>[];
+  positions: Map<string, Coordinates>;
 };
 
 type TableActions = {
@@ -78,7 +80,6 @@ const defaultInitState: TableState = {
       uniqueFields: [],
       uniqueIndexes: [],
       isGenerated: false,
-      position: { x: 0, y: 0 },
     },
     {
       name: "User",
@@ -138,7 +139,6 @@ const defaultInitState: TableState = {
       uniqueFields: [],
       uniqueIndexes: [],
       isGenerated: false,
-      position: { x: 0, y: 0 },
     },
     {
       name: "Post",
@@ -211,7 +211,6 @@ const defaultInitState: TableState = {
       uniqueFields: [],
       uniqueIndexes: [],
       isGenerated: false,
-      position: { x: 0, y: 0 },
     },
     {
       name: "Category",
@@ -255,20 +254,31 @@ const defaultInitState: TableState = {
       uniqueFields: [],
       uniqueIndexes: [],
       isGenerated: false,
-      position: { x: 0, y: 0 },
     },
   ],
+  positions: new Map<string, Coordinates>(),
 };
 
-const defaultModel: MutableDeep<DMMF.Model & { position: Coordinates }> = {
+const defaultField: MutableDeep<DMMF.Field> = {
+  name: "id",
+  kind: "scalar",
+  isList: false,
+  isRequired: true,
+  isUnique: false,
+  isId: true,
+  isReadOnly: false,
+  hasDefaultValue: false,
+  type: "Int",
+};
+
+const defaultModel: MutableDeep<DMMF.Model> = {
   name: "",
   dbName: null,
-  fields: [],
+  fields: [defaultField],
   primaryKey: null,
   uniqueFields: [],
   uniqueIndexes: [],
   isGenerated: false,
-  position: { x: 0, y: 0 },
 };
 
 export const createTableStore: ImmerStateCreator<TableStore> = (
@@ -279,20 +289,15 @@ export const createTableStore: ImmerStateCreator<TableStore> = (
   ...defaultInitState,
   updateTablePosition(tableName, position) {
     set((state) => {
-      state.tables = state.tables.map((table) => {
-        if (table.name === tableName) {
-          return {
-            ...table,
-            position,
-          };
-        }
-        return table;
-      });
+      state.positions.set(tableName, position);
     });
   },
   addNewTable: () => {
     set((state) => {
-      state.tables.push(defaultModel);
+      state.tables.push({
+        ...defaultModel,
+        name: `Table ${state.tables.length + 1}`,
+      });
     });
   },
   removeTable(tableName) {
@@ -303,18 +308,7 @@ export const createTableStore: ImmerStateCreator<TableStore> = (
   refreshTables(models) {
     console.log(models, "models");
     set((state) => {
-      state.tables = state.tables.map((table, index) => {
-        const model = models.find(
-          (m) => m.name === table.name,
-        ) as MutableDeep<DMMF.Model>;
-        if (model) {
-          return {
-            ...table,
-            ...model,
-          };
-        }
-        return table;
-      });
+      state.tables = models as MutableDeep<DMMF.Model>[];
     });
   },
 });
