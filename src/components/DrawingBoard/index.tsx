@@ -69,7 +69,10 @@ const Lines = () => {
   }, [tables]); // Empty dependency array ensures this runs only once on mount
 
   const findPositionAndWidth = (tableName: string, fieldName?: string) => {
-    const ModelElement = document.getElementById(tableName);
+    const ModelElement =
+      typeof document !== "undefined"
+        ? document.getElementById(tableName)
+        : null;
     const table = tables.find((table) => table.name === tableName)!;
     const fieldIndex = table.fields.findIndex(
       (field) => field.name === fieldName,

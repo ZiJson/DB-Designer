@@ -25,9 +25,9 @@ export const prismaLinter =
       });
     };
 
-    const { success, dmmf, error } = await schemaToDmmf(text);
-    if (!success) {
-      const errors = splitPrismaErrors(error as string);
+    const { dmmf, error } = await schemaToDmmf(text);
+    if (error) {
+      const errors = splitPrismaErrors(error);
       errors.forEach((error) => {
         addDiagnostic({
           ...getLineIndices(text, error.lineNumber),
@@ -38,7 +38,6 @@ export const prismaLinter =
     } else {
       callback(dmmf as DMMF.Document);
     }
-
     return diagnostics;
   };
 
@@ -50,18 +49,15 @@ function splitPrismaErrors(rawError: string): {
   const cleanedError = rawError
     .replace(/\[\d+m/g, "") // Remove [31m, [1m escape sequences
     .replace(/\[([0-9;]+)m/g, "") // Remove other terminal color codes
-    .trim();
+    .replace(/\u001b/g, ""); // Remove \u001b
 
   const errorLines = cleanedError.split("\n");
-
   // Parse error lines to create diagnostics
   return errorLines.reduce(
     (acc: { message: string; lineNumber: number }[], line, index) => {
-      if (line.includes("\u001b\u001berror\u001b: \u001b")) {
-        const message = line.split("\u001b\u001berror\u001b: \u001b")[1].trim();
-        const lineNumber = +errorLines[index + 1]
-          .split(":")[1]
-          .split("\u001b")[0];
+      if (line.includes("error:")) {
+        const message = line.split("error:")[1].trim();
+        const lineNumber = +errorLines[index + 1].split("schema.prisma:")[1];
         acc.push({ message, lineNumber });
       }
       return acc;

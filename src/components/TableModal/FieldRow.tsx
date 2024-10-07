@@ -1,5 +1,4 @@
 import { Field } from "@/types/Table";
-import Node from "./Node";
 import { useWorkspaceStore } from "@/providers/workspace-store-provider";
 import { shallow } from "zustand/shallow";
 import { CornerLeftUp } from "lucide-react";

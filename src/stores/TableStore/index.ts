@@ -4,7 +4,7 @@ import { Model, ModelField, ScalarTypes } from "@/types/Database";
 import { DMMF, type ReadonlyDeep } from "@prisma/generator-helper";
 import { stat } from "fs";
 
-type MutableDeep<T> = {
+export type MutableDeep<T> = {
   -readonly [P in keyof T]: MutableDeep<T[P]>;
 };
 

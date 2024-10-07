@@ -6,7 +6,6 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import FieldInfoCard from "./FieldInfoCard";
-import Drawer from "./Drawer";
 import FieldRow from "./FieldRow";
 import Draggable from "../dnd/Draggable";
 import { useWorkspaceStore } from "@/providers/workspace-store-provider";
@@ -24,9 +23,10 @@ import { Model, ModelField } from "@/types/Database";
 import next from "next";
 import { DataTable } from "../CustomUI";
 import { ColumnDef } from "@tanstack/react-table";
-
+import { DMMF } from "@prisma/generator-helper";
+import { MutableDeep } from "@/stores/TableStore";
 interface Props {
-  tableData: Model;
+  tableData: DMMF.Model;
 }
 const TableModal = ({ tableData }: Props) => {
   const startPosition = useRef<Coordinates | null>(null);
@@ -75,7 +75,7 @@ const TableModal = ({ tableData }: Props) => {
     >
       <DataTable
         columns={columns}
-        data={tableData.fields}
+        data={tableData.fields as MutableDeep<DMMF.Field>[]}
         title={tableData.name}
         className={`group absolute z-20 bg-white transition-transform ${
           isDragging ? "scale-105 shadow-md" : ""
@@ -93,14 +93,14 @@ type FieldTableCol = {
   type: string;
 };
 
-export const columns: ColumnDef<FieldTableCol, ModelField>[] = [
+export const columns: ColumnDef<FieldTableCol, MutableDeep<DMMF.Field>>[] = [
   {
     accessorKey: "name",
   },
   {
     accessorKey: "type",
     cell: (info) => {
-      const row = info.row.original as ModelField;
+      const row = info.row.original as MutableDeep<DMMF.Field>;
       return `${row.type}${row.isList ? "[]" : ""}${row.isRequired ? "" : "?"}`;
     },
   },

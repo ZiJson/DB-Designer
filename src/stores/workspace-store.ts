@@ -3,7 +3,6 @@ import { devtools, persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import { CanvasStore, createCanvasStore } from "./CanvasStore";
 import { createTableStore, TableStore } from "./TableStore";
-import { createRelationStore, RelationStore } from "./RelationStore";
 import { createDashboardStore, DashboardStore } from "./Dashboard";
 
 export type WorkspaceState = {};
@@ -14,7 +13,6 @@ export type WorkspaceStore = WorkspaceState &
   WorkspaceActions &
   CanvasStore &
   TableStore &
-  RelationStore &
   DashboardStore;
 
 export const defaultInitState: WorkspaceState = {};
@@ -29,7 +27,6 @@ export const createWorkspaceStore = (
         ...initState,
         ...createCanvasStore(...args),
         ...createTableStore(...args),
-        ...createRelationStore(...args),
         ...createDashboardStore(...args),
       })),
       {
