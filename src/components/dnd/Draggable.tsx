@@ -47,7 +47,7 @@ function Draggable({
       {...listeners}
       {...attributes}
       style={{ ...transformStyle }}
-      className={`${className} fixed ${
+      className={`${className} ${
         isDragging ? "cursor-grabbing" : "cursor-default"
       } `}
     >

@@ -7,19 +7,11 @@ import { DndContext, MouseSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { useEffect, useState } from "react";
 
 const DrawingBoard = () => {
-  const sensors = useSensors(
-    useSensor(MouseSensor, {
-      activationConstraint: { delay: 100, tolerance: 1000, distance: 10 },
-    }),
-  );
-
   return (
-    <DndContext sensors={sensors}>
-      <Canvas>
-        <Lines />
-        <Models />
-      </Canvas>
-    </DndContext>
+    <Canvas>
+      <Lines />
+      <Models />
+    </Canvas>
   );
 };
 
