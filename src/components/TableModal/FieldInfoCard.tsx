@@ -1,4 +1,3 @@
-import { Field, FieldToggle, ToggleType } from "@/types/Table";
 import { Badge } from "@/components/ui/badge";
 import { FieldAttributes, ModelField } from "@/types/Database";
 
@@ -9,7 +8,7 @@ const FieldInfoCard = ({ field }: { field: ModelField }) => {
         <p className="scroll-m-20 text-xl font-semibold tracking-tight">
           {field.name}
         </p>
-        <p className="text-slate-400">{field.type}</p>
+        <p className="text-card-foreground/80">{field.type}</p>
       </div>
       <div className="flex flex-wrap gap-2">
         {Object.values(FieldAttributes).map((t) => (

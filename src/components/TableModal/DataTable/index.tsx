@@ -57,7 +57,7 @@ function DataTable<TData, TValue>({
           <TableRow>
             <TableHead
               colSpan={columns.length}
-              className="h-auto bg-secondary-foreground py-2 text-center text-secondary"
+              className="h-auto bg-primary/90 py-2 text-center text-primary-foreground"
             >
               {title}
             </TableHead>

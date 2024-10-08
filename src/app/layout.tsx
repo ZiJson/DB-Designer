@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { WorkspaceStoreProvider } from "@/providers/workspace-store-provider";
+import { ThemeProvider } from "@/providers/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -19,9 +20,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <WorkspaceStoreProvider>
-          <div className="h-screen w-screen">{children}</div>
-        </WorkspaceStoreProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <WorkspaceStoreProvider>
+            <div className="h-screen w-screen">{children}</div>
+          </WorkspaceStoreProvider>
+        </ThemeProvider>
         <Toaster />
       </body>
     </html>

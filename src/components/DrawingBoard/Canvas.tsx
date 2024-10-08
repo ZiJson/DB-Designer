@@ -1,9 +1,7 @@
 "use client";
-import React, { useState } from "react";
 import { DragEndEvent, useDraggable } from "@dnd-kit/core";
 import { useWorkspaceStore } from "@/providers/workspace-store-provider";
 import Draggable from "../dnd/Draggable";
-import { Coordinates } from "@dnd-kit/core/dist/types";
 
 const canvasId = "canvas";
 
@@ -16,7 +14,7 @@ const Canvas = ({ children }: Props) => {
   const scale = useWorkspaceStore((state) => state.scale);
   const setScale = useWorkspaceStore((state) => state.setScale);
 
-  const { isDragging, transform } = useDraggable({
+  const { transform } = useDraggable({
     id: canvasId,
   });
   const onDragEnd = (event: DragEndEvent) => {
@@ -55,12 +53,12 @@ const Canvas = ({ children }: Props) => {
         draggableId={canvasId}
         onDragEnd={onDragEnd}
         isTransform={false}
-        className="absolute inset-0 h-full w-full overflow-hidden bg-white bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:20px_20px]"
+        className="bg-canvas absolute inset-0 h-full w-full overflow-hidden bg-background bg-[size:20px_20px]"
       >
         <div
           style={{ ...positionStyle, ...transformStyle }}
           id="canvas"
-          className="absolute h-8 w-8 border-4 border-b-0 border-r-0 border-solid border-slate-600"
+          className="absolute"
         >
           {children}
         </div>

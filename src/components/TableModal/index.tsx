@@ -1,30 +1,13 @@
-import { X } from "lucide-react";
 import { type TableModal, type Field } from "@/types/Table";
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card";
-import FieldInfoCard from "./FieldInfoCard";
-import FieldRow from "./FieldRow";
 import Draggable from "../dnd/Draggable";
 import { useWorkspaceStore } from "@/providers/workspace-store-provider";
-import {
-  DragEndEvent,
-  DragMoveEvent,
-  DragStartEvent,
-  useDndMonitor,
-  useDraggable,
-} from "@dnd-kit/core";
-import { shallow } from "zustand/shallow";
-import { memo, ReactEventHandler, useRef, useState } from "react";
+import { DragMoveEvent, DragStartEvent, useDraggable } from "@dnd-kit/core";
+import { memo, useRef } from "react";
 import { Coordinates } from "@dnd-kit/core/dist/types";
-import { Model, ModelField } from "@/types/Database";
-import next from "next";
-import { DataTable } from "../CustomUI";
 import { ColumnDef } from "@tanstack/react-table";
 import { DMMF } from "@prisma/generator-helper";
 import { MutableDeep } from "@/stores/TableStore";
+import DataTable from "./DataTable";
 interface Props {
   tableData: DMMF.Model;
 }
@@ -77,7 +60,7 @@ const TableModal = ({ tableData }: Props) => {
         columns={columns}
         data={tableData.fields as MutableDeep<DMMF.Field>[]}
         title={tableData.name}
-        className={`group absolute z-20 bg-white transition-transform ${
+        className={`group absolute z-20 bg-card text-card-foreground transition-transform ${
           isDragging ? "scale-105 shadow-md" : ""
         }`}
         style={positionStyle}
