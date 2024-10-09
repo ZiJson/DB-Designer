@@ -19,8 +19,16 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { schemaToDmmf } from "@/serverActions/dmmf";
-import Widget from "@/components/Widget";
-import { DndContext, MouseSensor, useSensor, useSensors } from "@dnd-kit/core";
+import Widget from "@/components/WidgetContainer/Widget";
+import {
+  DndContext,
+  DragOverlay,
+  MouseSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import WidgetContainer from "@/components/WidgetContainer";
+import Draggable from "@/components/dnd/Draggable";
 
 const Page = () => {
   const addNewTable = useWorkspaceStore((state) => state.addNewTable);
@@ -34,9 +42,11 @@ const Page = () => {
     <DndContext sensors={sensors}>
       <div className="relative flex h-full w-full">
         <DrawingBoard />
-        <Widget>
-          <CodeEditor />
-        </Widget>
+        <WidgetContainer>
+          <Widget>
+            <CodeEditor />
+          </Widget>
+        </WidgetContainer>
         <div className="absolute right-[50%] top-5 flex translate-x-[50%] gap-3">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

@@ -306,7 +306,6 @@ export const createTableStore: ImmerStateCreator<TableStore> = (
     });
   },
   refreshTables(models) {
-    console.log(models, "models");
     set((state) => {
       state.tables = models as MutableDeep<DMMF.Model>[];
     });
