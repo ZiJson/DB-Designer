@@ -1,8 +1,14 @@
 "use client";
-import { DragEndEvent, useDraggable } from "@dnd-kit/core";
+import {
+  DragEndEvent,
+  DragMoveEvent,
+  DragStartEvent,
+  useDraggable,
+} from "@dnd-kit/core";
 import { useWorkspaceStore } from "@/providers/workspace-store-provider";
 import Draggable from "../dnd/Draggable";
 import { useRef, useState } from "react";
+import { Coordinates } from "@dnd-kit/core/dist/types";
 
 const canvasId = "canvas";
 
@@ -15,24 +21,24 @@ const Canvas = ({ children }: Props) => {
   const scale = useWorkspaceStore((state) => state.scale);
   const setScale = useWorkspaceStore((state) => state.setScale);
   const [isScaling, setIsScaling] = useState(false);
-
+  const startPosition = useRef<Coordinates | null>(null);
   // 使用 useRef 保存 scaleTimeout
   const scaleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const { transform, isDragging } = useDraggable({
-    id: canvasId,
-  });
-  const onDragEnd = (event: DragEndEvent) => {
+  const onDragStart = (event: DragStartEvent) => {
     if (event.active.id !== canvasId) return;
+    startPosition.current = position;
+  };
+  const onDragMove = (event: DragMoveEvent) => {
+    if (event.active.id !== canvasId || !startPosition.current) return;
     const { x, y } = event.delta;
     setPosition({
-      x: position.x + x,
-      y: position.y + y,
+      x: startPosition.current.x + x,
+      y: startPosition.current.y + y,
     });
   };
   const onWheel = (e: React.WheelEvent<HTMLDivElement>) => {
     const { x: canvasX, y: canvasY } = position;
-
     const { deltaY, clientX, clientY } = e;
     const scaleSize = deltaY < 0 ? 0.1 : -0.1;
     const tx = (clientX - canvasX) * scaleSize;
@@ -58,24 +64,22 @@ const Canvas = ({ children }: Props) => {
   const positionStyle = {
     top: position.y,
     left: position.x,
+    scale: scale,
   };
-  const transformStyle = {
-    transform: transform
-      ? `translate3d(${transform.x}px, ${transform.y}px, 0) scale(${scale})`
-      : `scale(${scale})`,
-  };
+  const { isDragging } = useDraggable({ id: canvasId });
   return (
     <div onWheel={onWheel} className="relative h-screen w-screen">
       <Draggable
         draggableId={canvasId}
-        onDragEnd={onDragEnd}
+        onDragStart={onDragStart}
+        onDragMove={onDragMove}
         isTransform={false}
         className="absolute inset-0 h-full w-full overflow-hidden bg-background bg-opacity-10 bg-canvas bg-[size:20px_20px]"
       >
         <div
-          style={{ ...positionStyle, ...transformStyle }}
+          style={{ ...positionStyle }}
           id="canvas"
-          className={`absolute duration-500 ${isScaling || isDragging ? "transition-none" : "transition-all"}`}
+          className={`absolute ${isScaling ? "transition-none" : "transition-all"} ${isDragging ? "duration-200 ease-out" : "duration-500"}`}
         >
           {children}
         </div>

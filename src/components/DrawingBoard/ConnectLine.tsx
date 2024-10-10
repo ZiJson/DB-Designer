@@ -6,17 +6,10 @@ import { Badge } from "../ui/badge";
 interface Props {
   p1: Coordinates;
   p2: Coordinates;
-  strokeColor?: string;
   mode: CONNECT_MODE;
   title?: string;
 }
-const ConnectLine = ({
-  p1,
-  p2,
-  strokeColor = "rgb(100 116 139)",
-  mode,
-  title,
-}: Props) => {
+const ConnectLine = ({ p1, p2, mode, title }: Props) => {
   const strokeWidth = 4;
   const deltaX = p2.x - p1.x;
   const deltaY = p2.y - p1.y;
@@ -88,7 +81,7 @@ const getPath: Record<
     const width = Math.max(Math.abs(deltaX), strokeWidth);
     const height = Math.max(Math.abs(deltaY), strokeWidth);
 
-    const radius = Math.min(20, height / 2, width);
+    const radius = Math.min(40, height / 2, width);
 
     const startPoint = [0, deltaX * deltaY > 0 ? 0 : height];
     const endPoint = [width, deltaX * deltaY < 0 ? 0 : height];
@@ -121,7 +114,7 @@ const getPath: Record<
     const width = Math.max(Math.abs(deltaX), strokeWidth);
     const height = Math.max(Math.abs(deltaY), strokeWidth);
 
-    const radius = Math.min(20, height / 2, width);
+    const radius = Math.min(40, height / 2, width);
 
     const startPoint = [deltaX < 0 ? width : 0, deltaY < 0 ? height : 0];
     const endPoint = [deltaX < 0 ? 0 : width, deltaY < 0 ? 0 : height];

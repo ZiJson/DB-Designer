@@ -18,7 +18,7 @@ const WidgetContainer = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <Fragment>
-      <Card className="absolute bottom-[24px] left-1/2 z-30 flex -translate-x-1/2 gap-2 rounded-xl p-2 shadow-lg">
+      <Card className="absolute bottom-[24px] left-1/2 z-30 flex -translate-x-1/2 gap-2 rounded-xl p-2 shadow-lg transition-all hover:scale-110">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="icon">

@@ -1,3 +1,4 @@
+"use client";
 import { Card } from "@/components/ui/card";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "../../ui/button";
@@ -38,42 +39,61 @@ const Widget = ({
   widgetId = "widget1",
   padding = 24,
 }: Props) => {
+  const [windowSize, setWindowSize] = useState({
+    height: 10000,
+    width: 10000,
+  });
   const [widgetSide, setWidgetSide] = useState(side);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isShowToolbar, setIsShowToolbar] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const startPosition = useRef<Position | null>(null);
   const [position, setPosition] = useState<Position>({
-    top: window.innerHeight - WidgetRect.height - padding,
+    top: windowSize.height - WidgetRect.height - padding,
     left: padding,
-    right: window.innerWidth - WidgetRect.width - padding,
+    right: windowSize.width - WidgetRect.width - padding,
     bottom: padding,
   });
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    setWindowSize({
+      width: window.innerWidth,
+      height: window.innerHeight,
+    });
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const getSidePosition = useCallback(
     (side: "left" | "right"): Position => {
       if (!containerRef.current) return position;
       const top = isExpanded
         ? padding + 30
-        : window.innerHeight - padding - WidgetRect.height;
+        : windowSize.height - padding - WidgetRect.height;
       switch (side) {
         case "left":
           return {
             top,
             left: padding,
-            right: window.innerWidth - WidgetRect.width - padding,
+            right: windowSize.width - WidgetRect.width - padding,
             bottom: padding,
           };
         case "right":
           return {
             top,
             right: padding,
-            left: window.innerWidth - WidgetRect.width - padding,
+            left: windowSize.width - WidgetRect.width - padding,
             bottom: padding,
           };
       }
     },
-    [padding, isExpanded],
+    [padding, isExpanded, windowSize.height, windowSize.width],
   );
 
   const { isDragging } = useDraggable({
@@ -114,7 +134,7 @@ const Widget = ({
     if (event.active.id !== widgetId) return;
     const { x: deltaX, y: deltaY } = event.delta;
     const { x, y } = event.activatorEvent as MouseEvent;
-    const windowWidth = window.innerWidth;
+    const windowWidth = windowSize.width;
     const windowHeight = window.innerHeight;
     if (windowWidth / 2 < x + deltaX) {
       setWidgetSide("right");
@@ -122,7 +142,8 @@ const Widget = ({
       setWidgetSide("left");
     }
   };
-
+  console.log(windowSize, position);
+  if (windowSize.width === 0) return null;
   return (
     <Draggable
       draggableId={widgetId}
