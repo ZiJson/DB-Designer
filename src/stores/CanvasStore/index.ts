@@ -9,6 +9,7 @@ type CanvasState = {
 type CanvasActions = {
   setScale: (scale: number) => void;
   setCanvasPosition: (position: Coordinates) => void;
+  resizeCanvas: () => void;
 };
 
 export type CanvasStore = CanvasState & CanvasActions;
@@ -28,4 +29,11 @@ export const createCanvasStore: ImmerStateCreator<CanvasStore> = (set) => ({
     set((state) => {
       state.position = position;
     }),
+  resizeCanvas: () => {
+    set((state) => {
+      state.scale = 1;
+      state.position = { x: 0, y: 0 };
+      console.log("resizeCanvas");
+    });
+  },
 });

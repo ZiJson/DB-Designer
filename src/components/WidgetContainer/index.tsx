@@ -1,32 +1,49 @@
-import { DragOverlay, Modifier } from "@dnd-kit/core";
-import Droppable from "../dnd/Droppable";
 import { Fragment } from "react";
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Card } from "../ui/card";
-import Draggable from "../dnd/Draggable";
+import { Button } from "../ui/button";
+import { MoonIcon, Scaling, SunIcon } from "lucide-react";
+import { useTheme } from "next-themes";
+import { useWorkspaceStore } from "@/providers/workspace-store-provider";
 
 const WidgetContainer = ({ children }: { children: React.ReactNode }) => {
-  //   const snapToGrid: Modifier = (args) => {
-  //     const { transform, windowRect, draggingNodeRect } = args;
-  //     console.log((draggingNodeRect?.left || 0) + transform.x);
-  //     const isleft =
-  //       (draggingNodeRect?.left || 0) + transform.x <
-  //       (windowRect?.width || 0) / 2;
-  //     console.log(isleft);
-  //     return {
-  //       ...transform,
-  //       x: isleft ? 0 : windowRect?.width,
-  //       y: 0,
-  //     };
-  //   };
+  const { setTheme } = useTheme();
+  const resizeCanvas = useWorkspaceStore((state) => state.resizeCanvas);
+
   return (
     <Fragment>
+      <Card className="absolute bottom-[24px] left-1/2 z-30 flex -translate-x-1/2 gap-2 rounded-xl p-2 shadow-lg">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="icon">
+              <SunIcon className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <MoonIcon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+              <span className="sr-only">Toggle theme</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => setTheme("light")}>
+              Light
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme("dark")}>
+              Dark
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme("system")}>
+              System
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <Button variant="outline" size="icon" onClick={() => resizeCanvas()}>
+          <Scaling className="h-[1.2rem] w-[1.2rem]" />
+        </Button>
+      </Card>
       {children}
-      {/* <DragOverlay
-        className="h-2 w-2 border border-primary transition-all duration-300 ease-out"
-        dropAnimation={null}
-        // zIndex={0}
-        modifiers={[snapToGrid]}
-      ></DragOverlay> */}
     </Fragment>
   );
 };

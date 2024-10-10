@@ -4,6 +4,7 @@ import { immer } from "zustand/middleware/immer";
 import { enableMapSet } from "immer";
 import { CanvasStore, createCanvasStore } from "./CanvasStore";
 import { createTableStore, TableStore } from "./TableStore";
+import { createWidgetStore, WidgetStore } from "./WidgetStore";
 import { createDashboardStore, DashboardStore } from "./Dashboard";
 
 export type WorkspaceState = {};
@@ -14,6 +15,7 @@ export type WorkspaceStore = WorkspaceState &
   WorkspaceActions &
   CanvasStore &
   TableStore &
+  WidgetStore &
   DashboardStore;
 
 export const defaultInitState: WorkspaceState = {};
@@ -28,6 +30,7 @@ export const createWorkspaceStore = (
         ...createCanvasStore(...args),
         ...createTableStore(...args),
         ...createDashboardStore(...args),
+        ...createWidgetStore(...args),
       })),
       {
         name: "workspace-store",
