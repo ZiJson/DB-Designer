@@ -18,18 +18,18 @@ const DrawingBoard = () => {
 export default DrawingBoard;
 
 const Models = () => {
-  const tables = useWorkspaceStore((state) => state.tables);
+  const models = useWorkspaceStore((state) => state.models);
   return (
     <>
-      {tables.map((table) => (
-        <TableModal key={table.name} tableData={table} />
+      {models.map((model) => (
+        <TableModal key={model.name} tableData={model} />
       ))}
     </>
   );
 };
 
 const Lines = () => {
-  const tables = useWorkspaceStore((state) => state.tables);
+  const models = useWorkspaceStore((state) => state.models);
   const positions = useWorkspaceStore((state) => state.positions);
   const [rerender, setRerender] = useState(false);
 
@@ -39,7 +39,7 @@ const Lines = () => {
     }, 0);
 
     return () => clearTimeout(timer); // Cleanup the timer when component unmounts
-  }, [tables]); // Empty dependency array ensures this runs only once on mount
+  }, [models]); // Empty dependency array ensures this runs only once on mount
 
   const findPositionAndWidth = (tableName: string, fieldName?: string) => {
     const position = positions.get(tableName) || { x: 0, y: 0 };
@@ -47,8 +47,8 @@ const Lines = () => {
       typeof document !== "undefined"
         ? document.getElementById(tableName)
         : null;
-    const table = tables.find((table) => table.name === tableName)!;
-    const fieldIndex = table.fields.findIndex(
+    const model = models.find((model) => model.name === tableName)!;
+    const fieldIndex = model.fields.findIndex(
       (field) => field.name === fieldName,
     );
     return {
@@ -58,15 +58,15 @@ const Lines = () => {
     };
   };
 
-  const relations = tables.flatMap((table) =>
-    table.fields
+  const relations = models.flatMap((model) =>
+    model.fields
       .filter(
         (field) => field.kind === "object" && !field.relationFromFields?.length,
       )
       .map((field) => {
         return {
           from: [field.type],
-          to: [table.name, field.name],
+          to: [model.name, field.name],
           name: field.relationName,
         };
       }),

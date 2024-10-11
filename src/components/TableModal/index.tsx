@@ -18,8 +18,8 @@ const TableModal = ({ tableData }: Props) => {
   );
   const removeTable = useWorkspaceStore((state) => state.removeTable);
   const scale = useWorkspaceStore((state) => state.scale);
-  const position = useWorkspaceStore(
-    (state) => state.positions.get(tableData.name) || { x: 0, y: 0 },
+  const position = useWorkspaceStore((state) =>
+    state.getTablePosition(tableData.name),
   );
 
   const onDragMove = (event: DragMoveEvent) => {
@@ -36,11 +36,6 @@ const TableModal = ({ tableData }: Props) => {
     startPosition.current = position;
   };
 
-  const onRemove = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    removeTable(tableData.name);
-  };
   const positionStyle = {
     top: position.y,
     left: position.x,
@@ -60,8 +55,8 @@ const TableModal = ({ tableData }: Props) => {
         columns={columns}
         data={tableData.fields as MutableDeep<DMMF.Field>[]}
         title={tableData.name}
-        className={`group absolute z-20 bg-card text-card-foreground transition-transform ${
-          isDragging ? "scale-105 shadow-md" : ""
+        className={`group absolute z-20 bg-card text-card-foreground shadow-lg transition-transform ${
+          isDragging ? "scale-105 shadow-xl" : ""
         }`}
         style={positionStyle}
       />

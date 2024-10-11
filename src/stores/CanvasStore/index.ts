@@ -9,7 +9,7 @@ type CanvasState = {
 type CanvasActions = {
   setScale: (scale: number) => void;
   setCanvasPosition: (position: Coordinates) => void;
-  resizeCanvas: () => void;
+  resizeCanvas: (modelName?: string) => void;
 };
 
 export type CanvasStore = CanvasState & CanvasActions;
@@ -32,19 +32,24 @@ export const createCanvasStore: ImmerStateCreator<CanvasStore> = (
     set((state) => {
       state.position = position;
     }),
-  resizeCanvas: () => {
+  resizeCanvas: (modelName?: string) => {
     set((state) => {
-      const canvasScale = get().scale;
-      const positions = Array.from(get().positions.entries())
+      const { positions, scale: canvasScale, models } = get();
+
+      if (typeof document === "undefined") return;
+
+      const windowHeight = document.documentElement.clientHeight;
+      const windowWidth = document.documentElement.clientWidth;
+
+      const relevantPositions = Array.from(positions.entries())
+        .filter(
+          ([key]) =>
+            models.some((model) => model.name === key) &&
+            (key === modelName || !modelName),
+        )
         .map(([key, coor]) => {
-          const el =
-            typeof document !== "undefined"
-              ? document.getElementById(key)
-              : null;
-          const { width, height } = el?.getBoundingClientRect() || {
-            width: 0,
-            height: 0,
-          };
+          const el = document.getElementById(key);
+          const { width = 0, height = 0 } = el?.getBoundingClientRect() || {};
           return [
             coor,
             {
@@ -54,40 +59,39 @@ export const createCanvasStore: ImmerStateCreator<CanvasStore> = (
           ];
         })
         .flat();
-      const windowHeight =
-        typeof document !== "undefined"
-          ? document.documentElement.clientHeight
-          : 0;
-      const windowWidth =
-        typeof document !== "undefined"
-          ? document.documentElement.clientWidth
-          : 0;
+
+      if (relevantPositions.length === 0) {
+        state.scale = 1;
+        state.position = { x: 0, y: 0 };
+        return;
+      }
+
+      const xCoords = relevantPositions.map((coord) => coord.x);
+      const yCoords = relevantPositions.map((coord) => coord.y);
 
       const rect = {
-        left: Math.min(...positions.map((coord) => coord.x)),
-        top: Math.min(...positions.map((coord) => coord.y)),
-        right: Math.max(...positions.map((coord) => coord.x)),
-        bottom: Math.max(...positions.map((coord) => coord.y)),
+        left: Math.min(...xCoords),
+        top: Math.min(...yCoords),
+        right: Math.max(...xCoords),
+        bottom: Math.max(...yCoords),
       };
+
       const rectWidth = rect.right - rect.left;
       const rectHeight = rect.bottom - rect.top;
-      const newScale =
-        positions.length > 0
-          ? Math.min(
-              (windowWidth * 0.9) / rectWidth,
-              (windowHeight * 0.9) / rectHeight,
-              1,
-            )
-          : 1;
+
+      const newScale = Math.min(
+        (windowWidth * 0.9) / rectWidth,
+        (windowHeight * 0.9) / rectHeight,
+        1,
+      );
+
       const newPosition: Coordinates = {
         x: (windowWidth - (rect.left + rect.right) * newScale) / 2,
         y: (windowHeight - (rect.top + rect.bottom) * newScale) / 2,
       };
-      // console.log(newPosition, newScale);
-      state.scale = newScale;
 
+      state.scale = newScale;
       state.position = newPosition;
-      console.log("resizeCanvas");
     });
   },
 });

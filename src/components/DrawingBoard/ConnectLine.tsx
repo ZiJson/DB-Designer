@@ -34,7 +34,7 @@ const ConnectLine = ({ p1, p2, mode, title }: Props) => {
         }
         height={height + strokeWidth}
         viewBox={viewBox}
-        className={`absolute -z-10 text-primary/60 drop-shadow-sm ${
+        className={`absolute -z-10 text-primary/60 drop-shadow-2xl ${
           mode === CONNECT_MODE.STRAIGHT ? "z-10" : ""
         }`}
         style={positionStyle}

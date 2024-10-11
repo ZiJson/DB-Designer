@@ -1,26 +1,32 @@
-import React from "react";
-import CodeMirror, { ViewUpdate } from "@uiw/react-codemirror";
+import CodeMirror from "@uiw/react-codemirror";
 import { StreamLanguage } from "@codemirror/language";
 import { prismaCompletion } from "./mention";
-import { linter, lintGutter, Diagnostic } from "@codemirror/lint";
+import { linter, lintGutter } from "@codemirror/lint";
 import { autocompletion } from "@codemirror/autocomplete";
 import { prismaLinter } from "./linter";
 import { DMMF } from "@prisma/generator-helper";
 import { useWorkspaceStore } from "@/providers/workspace-store-provider";
 import { useTheme } from "next-themes";
+import { convertDMMFToPrismaSchema } from "@/lib/tools";
 
 function CodeEditor() {
-  const [value, setValue] = React.useState(defaultValue);
-  const { theme } = useTheme();
+  const models = useWorkspaceStore(
+    (state) => state.models,
+    (prev, next) => {
+      return true;
+    },
+  );
+
+  const { theme, systemTheme } = useTheme();
   const refreshTables = useWorkspaceStore((state) => state.refreshTables);
   const onSuccess = (dmmf: DMMF.Document) => {
     refreshTables(dmmf.datamodel.models);
   };
-
+  console.log(systemTheme);
   return (
     <CodeMirror
-      value={value}
-      theme={theme === "system" ? "none" : (theme as "light" | "dark")}
+      value={convertDMMFToPrismaSchema({ models })}
+      theme={theme === "system" ? systemTheme : (theme as "light" | "dark")}
       extensions={[
         prismaLang,
         linter(prismaLinter(onSuccess)),
@@ -48,36 +54,3 @@ const prismaLang = StreamLanguage.define({
     return null; // 其他默认无高亮
   },
 });
-
-const defaultValue = `datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
-generator client {
-  provider = "prisma-client-js"
-}
-
-model User {
-  id      Int      @id @default(autoincrement())
-  posts   Post[]
-  profile Profile?
-}
-
-model Profile {
-  id     Int  @id @default(autoincrement())
-  user   User @relation(fields: [userId], references: [id])
-  userId Int  @unique // relation scalar field (used in the  attribute above)
-}
-
-model Post {
-  id         Int @id @default(autoincrement())
-  author     User       @relation(fields: [authorId], references: [id])
-  authorId   Int // relation scalar field  (used in the attribute above)
-  categories Category[]
-}
-
-model Category {
-  id    Int    @id @default(autoincrement())
-  posts Post[]
-}`;

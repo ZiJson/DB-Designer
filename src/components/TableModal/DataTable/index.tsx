@@ -24,6 +24,7 @@ import {
 import FieldInfoCard from "@/components/TableModal/FieldInfoCard";
 import { ModelField } from "@/types/Database";
 import { useDraggable } from "@dnd-kit/core";
+import { Portal as HoverCardPortal } from "@radix-ui/react-hover-card";
 
 interface DataTableProps<TData, TValue>
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -82,14 +83,16 @@ function DataTable<TData, TValue>({
                     ))}
                   </TableRow>
                 </HoverCardTrigger>
-                <HoverCardContent
-                  side="left"
-                  sideOffset={10}
-                  align="start"
-                  hidden={isDragging}
-                >
-                  <FieldInfoCard field={row.original as ModelField} />
-                </HoverCardContent>
+                <HoverCardPortal>
+                  <HoverCardContent
+                    side="left"
+                    sideOffset={10}
+                    align="start"
+                    hidden={isDragging}
+                  >
+                    <FieldInfoCard field={row.original as ModelField} />
+                  </HoverCardContent>
+                </HoverCardPortal>
               </HoverCard>
             ))
           ) : (

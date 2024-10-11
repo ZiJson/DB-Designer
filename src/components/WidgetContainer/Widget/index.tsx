@@ -4,13 +4,14 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "../../ui/button";
 import { GripHorizontal, Maximize2, Minimize2 } from "lucide-react";
 import Draggable from "../../dnd/Draggable";
+import { useWindowSize } from "@uidotdev/usehooks";
 import {
   DragEndEvent,
   DragMoveEvent,
   DragStartEvent,
   useDraggable,
 } from "@dnd-kit/core";
-import { Coordinates } from "@dnd-kit/core/dist/types";
+import { useWorkspaceStore } from "@/providers/workspace-store-provider";
 
 type Position = {
   top: number;
@@ -35,73 +36,68 @@ interface Props {
 const Widget = ({
   children,
   className,
-  side = "left",
   widgetId = "widget1",
   padding = 24,
 }: Props) => {
-  const [windowSize, setWindowSize] = useState({
-    height: 10000,
-    width: 10000,
-  });
-  const [widgetSide, setWidgetSide] = useState(side);
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [isShowToolbar, setIsShowToolbar] = useState(false);
+  const { side, isExpanded, position, hide, isShowToolbar } = useWorkspaceStore(
+    (state) => state.widgets[widgetId],
+  );
+  const setWidgetSide = useWorkspaceStore((state) => state.setWidgetSide);
+  const toggletIsExpanded = useWorkspaceStore(
+    (state) => state.toggletIsExpanded,
+  );
+  const setWidgetPosition = useWorkspaceStore(
+    (state) => state.setWidgetPosition,
+  );
+  const setIsShowToolbar = useWorkspaceStore((state) => state.setIsShowToolbar);
+  const { width: windowWidth, height: windowHeight } = useWindowSize();
   const containerRef = useRef<HTMLDivElement>(null);
   const startPosition = useRef<Position | null>(null);
-  const [position, setPosition] = useState<Position>({
-    top: windowSize.height - WidgetRect.height - padding,
-    left: padding,
-    right: windowSize.width - WidgetRect.width - padding,
-    bottom: padding,
-  });
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    setWindowSize({
-      width: window.innerWidth,
-      height: window.innerHeight,
-    });
-    const handleResize = () => {
-      setWindowSize({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-    };
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
 
-  const getSidePosition = useCallback(
-    (side: "left" | "right"): Position => {
-      if (!containerRef.current) return position;
-      const top = isExpanded
-        ? padding + 30
-        : windowSize.height - padding - WidgetRect.height;
-      switch (side) {
-        case "left":
-          return {
-            top,
-            left: padding,
-            right: windowSize.width - WidgetRect.width - padding,
-            bottom: padding,
-          };
-        case "right":
-          return {
-            top,
-            right: padding,
-            left: windowSize.width - WidgetRect.width - padding,
-            bottom: padding,
-          };
-      }
-    },
-    [padding, isExpanded, windowSize.height, windowSize.width],
-  );
+  const getSidePosition = useCallback((): Position | null => {
+    if (!containerRef.current || !windowWidth || !windowHeight) return null;
+    if (hide)
+      return {
+        top: padding,
+        left: windowWidth / 2,
+        right: windowWidth / 2,
+        bottom: windowHeight - padding - 40,
+      };
+
+    const top = isExpanded
+      ? padding + 30
+      : windowHeight - padding - WidgetRect.height;
+    switch (side) {
+      case "left":
+        return {
+          top,
+          left: padding,
+          right: windowWidth - WidgetRect.width - padding,
+          bottom: padding,
+        };
+      case "right":
+        return {
+          top,
+          right: padding,
+          left: windowWidth - WidgetRect.width - padding,
+          bottom: padding,
+        };
+    }
+  }, [padding, side, isExpanded, windowWidth, windowHeight, hide]);
 
   const { isDragging } = useDraggable({
     id: widgetId,
   });
   useEffect(() => {
-    !isDragging && setPosition(getSidePosition(widgetSide));
-  }, [widgetSide, getSidePosition, isExpanded, isDragging]);
+    !isDragging && setWidgetPosition(widgetId, getSidePosition());
+  }, [
+    side,
+    getSidePosition,
+    isExpanded,
+    isDragging,
+    setWidgetPosition,
+    widgetId,
+  ]);
   const onDragStart = (event: DragStartEvent) => {
     if (event.active.id !== widgetId || !position) return;
     startPosition.current = position;
@@ -115,14 +111,14 @@ const Widget = ({
     const mouseY = e.clientY;
     const offsetY = mouseY - top;
     const trigger = offsetY < 40;
-    setIsShowToolbar(trigger);
+    setIsShowToolbar(widgetId, trigger);
   };
 
   const onDragMove = (event: DragMoveEvent) => {
     if (event.active.id !== widgetId || !startPosition.current) return;
     const { x, y } = event.delta;
 
-    setPosition({
+    setWidgetPosition(widgetId, {
       top: startPosition.current.top + y,
       left: startPosition.current.left + x,
       right: startPosition.current.right - x,
@@ -131,23 +127,19 @@ const Widget = ({
   };
 
   const onDragEnd = (event: DragEndEvent) => {
-    if (event.active.id !== widgetId) return;
+    if (event.active.id !== widgetId || !windowWidth) return;
     const { x: deltaX, y: deltaY } = event.delta;
     const { x, y } = event.activatorEvent as MouseEvent;
-    const windowWidth = windowSize.width;
-    const windowHeight = window.innerHeight;
     if (windowWidth / 2 < x + deltaX) {
-      setWidgetSide("right");
+      setWidgetSide(widgetId, "right");
     } else {
-      setWidgetSide("left");
+      setWidgetSide(widgetId, "left");
     }
   };
-  console.log(windowSize, position);
-  if (windowSize.width === 0) return null;
   return (
     <Draggable
       draggableId={widgetId}
-      className={`fixed z-10 rounded-lg ${className} transition-[top,transform,right,left,bottom]`}
+      className={`fixed rounded-lg ${className} transition-[top,transform,right,left,bottom,opacity] ${hide ? "opacity-0" : "opacity-100"} ${isDragging ? "z-20" : "z-10"}`}
       style={{ ...position }}
       isTransform={false}
       onDragMove={onDragMove}
@@ -166,8 +158,8 @@ const Widget = ({
         {children}
       </Card>
       <Card
-        className={`absolute bottom-0 left-1/2 -z-10 -translate-x-1/2 rounded-b-xl bg-primary/50 text-primary-foreground/70 transition-all duration-200 ${isShowToolbar ? "h-[calc(100%_+_2rem)] w-[calc(100%_+_1rem)]" : "h-full w-full"}`}
-        onMouseLeave={() => !isDragging && setIsShowToolbar(false)}
+        className={`absolute bottom-0 left-1/2 -z-10 -translate-x-1/2 rounded-b-xl bg-primary/50 text-primary-foreground/70 transition-all duration-200 ${isShowToolbar && !hide ? "h-[calc(100%_+_2rem)] w-[calc(100%_+_1rem)]" : "h-full w-full"}`}
+        onMouseLeave={() => !isDragging && setIsShowToolbar(widgetId, false)}
       >
         <Button
           className="absolute left-[0.5rem] top-1 h-6 w-8"
@@ -177,7 +169,7 @@ const Widget = ({
             e.preventDefault();
             e.stopPropagation();
           }}
-          onClick={() => setIsExpanded((pre) => !pre)}
+          onClick={() => toggletIsExpanded(widgetId)}
         >
           {!isExpanded ? (
             <Maximize2

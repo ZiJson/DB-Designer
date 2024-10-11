@@ -1,4 +1,4 @@
-import { schemaToDmmf } from "@/serverActions/dmmf";
+import { schemaToDmmf } from "@/actions/dmmf";
 import { linter, lintGutter, Diagnostic } from "@codemirror/lint";
 import { EditorView } from "@codemirror/view";
 import { DMMF } from "@prisma/generator-helper";

@@ -6,19 +6,28 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Toggle } from "@/components/ui/toggle";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
-import { MoonIcon, Scaling, SunIcon } from "lucide-react";
+import {
+  Code,
+  CodeXml,
+  MoonIcon,
+  Scaling,
+  Settings2,
+  SunIcon,
+} from "lucide-react";
 import { useTheme } from "next-themes";
 import { useWorkspaceStore } from "@/providers/workspace-store-provider";
+import { Separator } from "@/components/ui/separator";
 
 const WidgetContainer = ({ children }: { children: React.ReactNode }) => {
   const { setTheme } = useTheme();
   const resizeCanvas = useWorkspaceStore((state) => state.resizeCanvas);
-
+  const toggleWidgetHide = useWorkspaceStore((state) => state.toggleWidgetHide);
   return (
     <Fragment>
-      <Card className="absolute bottom-[24px] left-1/2 z-30 flex -translate-x-1/2 gap-2 rounded-xl p-2 shadow-lg transition-all hover:scale-110">
+      <Card className="absolute left-1/2 top-[20px] z-30 flex -translate-x-1/2 items-center gap-2 rounded-xl p-2 shadow-lg transition-all">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="icon">
@@ -42,6 +51,27 @@ const WidgetContainer = ({ children }: { children: React.ReactNode }) => {
         <Button variant="outline" size="icon" onClick={() => resizeCanvas()}>
           <Scaling className="h-[1.2rem] w-[1.2rem]" />
         </Button>
+        <Separator orientation="vertical" className="h-7" />
+        <Toggle
+          variant="outline"
+          size="icon"
+          pressed={useWorkspaceStore(
+            (state) => !state.widgets["codeEditor"].hide,
+          )}
+          onClick={() => toggleWidgetHide("codeEditor")}
+        >
+          <CodeXml className="h-[1.2rem] w-[1.2rem]" />
+        </Toggle>
+        <Toggle
+          variant="outline"
+          size="icon"
+          pressed={useWorkspaceStore(
+            (state) => !state.widgets["noCodeEditor"].hide,
+          )}
+          onClick={() => toggleWidgetHide("noCodeEditor")}
+        >
+          <Settings2 className="h-[1.2rem] w-[1.2rem]" />
+        </Toggle>
       </Card>
       {children}
     </Fragment>

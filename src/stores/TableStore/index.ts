@@ -1,20 +1,18 @@
 import { ImmerStateCreator } from "../workspace-store";
 import { Coordinates } from "@dnd-kit/core/dist/types";
-import { Model, ModelField, ScalarTypes } from "@/types/Database";
-import { DMMF, type ReadonlyDeep } from "@prisma/generator-helper";
-import { v4 as uuid } from "uuid";
-import { UUID } from "crypto";
+import { DMMF } from "@prisma/generator-helper";
 
 export type MutableDeep<T> = {
   -readonly [P in keyof T]: MutableDeep<T[P]>;
 };
 
 type TableState = {
-  tables: MutableDeep<DMMF.Model>[];
+  models: MutableDeep<DMMF.Model>[];
   positions: Map<string, Coordinates>;
 };
 
 type TableActions = {
+  getTablePosition: (tableName: string) => Coordinates; //Position
   updateTablePosition: (tableName: string, position: Coordinates) => void;
   refreshTables: (models: DMMF.Document["datamodel"]["models"]) => void;
   addNewTable: () => void;
@@ -24,7 +22,7 @@ type TableActions = {
 export type TableStore = TableState & TableActions;
 
 const defaultInitState: TableState = {
-  tables: [
+  models: [
     {
       name: "Profile",
       dbName: null,
@@ -287,6 +285,17 @@ export const createTableStore: ImmerStateCreator<TableStore> = (
   store,
 ) => ({
   ...defaultInitState,
+  getTablePosition(tableName) {
+    const position = get().positions.get(tableName);
+    if (!position) {
+      set((state) => {
+        state.positions.set(tableName, { x: 0, y: 0 });
+      });
+      return { x: 0, y: 0 };
+    } else {
+      return position;
+    }
+  },
   updateTablePosition(tableName, position) {
     set((state) => {
       state.positions.set(tableName, position);
@@ -294,20 +303,20 @@ export const createTableStore: ImmerStateCreator<TableStore> = (
   },
   addNewTable: () => {
     set((state) => {
-      state.tables.push({
+      state.models.push({
         ...defaultModel,
-        name: `Table ${state.tables.length + 1}`,
+        name: `Table ${state.models.length + 1}`,
       });
     });
   },
-  removeTable(tableName) {
+  removeTable(modelName) {
     set((state) => {
-      state.tables = state.tables.filter((table) => table.name !== tableName);
+      state.models = state.models.filter((model) => model.name !== modelName);
     });
   },
   refreshTables(models) {
     set((state) => {
-      state.tables = models as MutableDeep<DMMF.Model>[];
+      state.models = models as MutableDeep<DMMF.Model>[];
     });
   },
 });
