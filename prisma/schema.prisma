@@ -1,0 +1,23 @@
+model Profile {
+	id 	Int @id @default(autoincrement())
+	user 	User @relation("ProfileToUser", fields: [userId], references: [id])
+	userId 	Int @unique
+}
+
+model User {
+	id 	Int @id @default(autoincrement())
+	posts 	Post[] @relation("PostToUser")
+	profile 	Profile? @relation("ProfileToUser")
+}
+
+model Post {
+	id 	Int @id @default(autoincrement())
+	author 	User @relation("PostToUser", fields: [authorId], references: [id])
+	authorId 	Int
+	categories 	Category[] @relation("CategoryToPost")
+}
+
+model Category {
+	id 	Int @id @default(autoincrement())
+	posts 	Post[] @relation("CategoryToPost")
+}

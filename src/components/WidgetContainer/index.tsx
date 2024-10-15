@@ -9,17 +9,11 @@ import {
 import { Toggle } from "@/components/ui/toggle";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
-import {
-  Code,
-  CodeXml,
-  MoonIcon,
-  Scaling,
-  Settings2,
-  SunIcon,
-} from "lucide-react";
+import { CodeXml, MoonIcon, Scaling, Settings2, SunIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useWorkspaceStore } from "@/providers/workspace-store-provider";
 import { Separator } from "@/components/ui/separator";
+import ExportDialog from "./ExportDialog";
 
 const WidgetContainer = ({ children }: { children: React.ReactNode }) => {
   const { setTheme } = useTheme();
@@ -51,6 +45,7 @@ const WidgetContainer = ({ children }: { children: React.ReactNode }) => {
         <Button variant="outline" size="icon" onClick={() => resizeCanvas()}>
           <Scaling className="h-[1.2rem] w-[1.2rem]" />
         </Button>
+        <ExportDialog />
         <Separator orientation="vertical" className="h-7" />
         <Toggle
           variant="outline"

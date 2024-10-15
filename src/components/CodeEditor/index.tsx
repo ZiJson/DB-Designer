@@ -1,4 +1,4 @@
-import CodeMirror from "@uiw/react-codemirror";
+import CodeMirror, { ReactCodeMirrorProps } from "@uiw/react-codemirror";
 import { StreamLanguage } from "@codemirror/language";
 import { prismaCompletion } from "./mention";
 import { linter, lintGutter } from "@codemirror/lint";
@@ -8,34 +8,33 @@ import { DMMF } from "@prisma/generator-helper";
 import { useWorkspaceStore } from "@/providers/workspace-store-provider";
 import { useTheme } from "next-themes";
 import { convertDMMFToPrismaSchema } from "@/lib/tools";
+import { RefAttributes } from "react";
 
-function CodeEditor() {
-  const models = useWorkspaceStore(
-    (state) => state.models,
-    (prev, next) => {
-      return true;
-    },
+const CodeEditor = (props: ReactCodeMirrorProps) => {
+  const schema = useWorkspaceStore((state) =>
+    convertDMMFToPrismaSchema({ models: state.models }),
   );
 
   const { theme, systemTheme } = useTheme();
   const refreshTables = useWorkspaceStore((state) => state.refreshTables);
+  const updateErrors = useWorkspaceStore((state) => state.updateErrors);
   const onSuccess = (dmmf: DMMF.Document) => {
     refreshTables(dmmf.datamodel.models);
   };
-  console.log(systemTheme);
   return (
     <CodeMirror
-      value={convertDMMFToPrismaSchema({ models })}
+      {...props}
+      value={schema}
       theme={theme === "system" ? systemTheme : (theme as "light" | "dark")}
       extensions={[
         prismaLang,
-        linter(prismaLinter(onSuccess)),
+        linter(prismaLinter(onSuccess, updateErrors)),
         lintGutter({}),
         autocompletion({ override: [prismaCompletion] }),
       ]}
     />
   );
-}
+};
 export default CodeEditor;
 
 const prismaLang = StreamLanguage.define({

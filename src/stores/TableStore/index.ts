@@ -17,6 +17,13 @@ type TableActions = {
   refreshTables: (models: DMMF.Document["datamodel"]["models"]) => void;
   addNewTable: () => void;
   removeTable: (tableName: string) => void;
+  updateModelName: (tableName: string, name: string) => void;
+  updateFieldName: (tableName: string, fieldName: string, name: string) => void;
+  updateModelField: (
+    tableName: string,
+    fieldName: string,
+    field: MutableDeep<DMMF.Field>,
+  ) => void;
 };
 
 export type TableStore = TableState & TableActions;
@@ -317,6 +324,78 @@ export const createTableStore: ImmerStateCreator<TableStore> = (
   refreshTables(models) {
     set((state) => {
       state.models = models as MutableDeep<DMMF.Model>[];
+    });
+  },
+  updateModelName(tableName, name) {
+    set((state) => {
+      state.models = state.models.map((model) => {
+        if (model.name === tableName) {
+          model.name = name;
+          model.fields = model.fields.map((field) => {
+            if (field.kind === "object") {
+              field.relationName = field.relationName?.replace(tableName, name);
+            }
+            return field;
+          });
+        }
+        model.fields = model.fields.map((field) => {
+          if (field.type === tableName && field.kind === "object") {
+            field.type = name;
+            field.relationName = field.relationName?.replace(tableName, name);
+            console.log(field.relationName);
+          }
+          return field;
+        });
+        return model;
+      });
+      const tempPosition = get().positions.get(tableName)!;
+      state.positions.set(name, tempPosition);
+      state.positions.delete(tableName);
+    });
+  },
+  updateFieldName(tableName, fieldName, name) {
+    set((state) => {
+      state.models = state.models.map((model) => {
+        if (model.name === tableName) {
+          model.fields = model.fields.map((f) => {
+            if (f.name === fieldName) {
+              f.name = name;
+            }
+            return f;
+          });
+        }
+        model.fields = model.fields.map((field) => {
+          if (
+            field.type === tableName &&
+            field.kind === "object" &&
+            field.relationToFields?.includes(fieldName)
+          ) {
+            field.relationToFields = field.relationToFields?.map((field) => {
+              if (field === fieldName) {
+                return name;
+              }
+              return field;
+            });
+          }
+          return field;
+        });
+        return model;
+      });
+    });
+  },
+  updateModelField(tableName, fieldName, field) {
+    set((state) => {
+      state.models = state.models.map((model) => {
+        if (model.name === tableName) {
+          model.fields = model.fields.map((f) => {
+            if (f.name === fieldName) {
+              return field;
+            }
+            return f;
+          });
+        }
+        return model;
+      });
     });
   },
 });

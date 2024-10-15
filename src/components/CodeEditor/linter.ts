@@ -2,6 +2,7 @@ import { schemaToDmmf } from "@/actions/dmmf";
 import { linter, lintGutter, Diagnostic } from "@codemirror/lint";
 import { EditorView } from "@codemirror/view";
 import { DMMF } from "@prisma/generator-helper";
+import { toast } from "sonner";
 
 // Define a type for our custom lint result
 interface CustomLintResult {
@@ -13,7 +14,11 @@ interface CustomLintResult {
 
 // Custom linter function
 export const prismaLinter =
-  (callback: (dmmf: DMMF.Document) => void) => async (view: EditorView) => {
+  (
+    callback: (dmmf: DMMF.Document) => void,
+    onError: (error: string[]) => void,
+  ) =>
+  async (view: EditorView) => {
     const diagnostics: Diagnostic[] = [];
     const text = view.state.doc.toString();
     const addDiagnostic = (result: CustomLintResult) => {
@@ -28,11 +33,19 @@ export const prismaLinter =
     const { dmmf, error } = await schemaToDmmf(text);
     if (error) {
       const errors = splitPrismaErrors(error);
+      onError(errors.map((error) => error.message));
       errors.forEach((error) => {
         addDiagnostic({
           ...getLineIndices(text, error.lineNumber),
           severity: "error",
           message: error.message,
+        });
+        toast.error(error.message, {
+          duration: 10000,
+          cancel: {
+            label: "Cancel",
+            onClick: () => {},
+          },
         });
       });
     } else {

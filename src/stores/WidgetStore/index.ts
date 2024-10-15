@@ -22,6 +22,7 @@ type WidgetState = {
   widgets: {
     [key: string]: WidgetItem;
   };
+  errors: string[];
 };
 
 type WidgetActions = {
@@ -30,6 +31,7 @@ type WidgetActions = {
   setWidgetPosition: (widgetId: string, position: Position | null) => void;
   toggleWidgetHide: (widgetId: string) => void;
   setIsShowToolbar: (widgetId: string, isShowToolbar: boolean) => void;
+  updateErrors: (errors: string[]) => void;
 };
 
 export type WidgetStore = WidgetState & WidgetActions;
@@ -54,6 +56,7 @@ const defaultInitState: WidgetState = {
     codeEditor: defaultWidget,
     noCodeEditor: { ...defaultWidget, side: "right" },
   },
+  errors: [],
 };
 
 export const createWidgetStore: ImmerStateCreator<WidgetStore> = (
@@ -100,6 +103,11 @@ export const createWidgetStore: ImmerStateCreator<WidgetStore> = (
   setIsShowToolbar: (widgetId: string, isShowToolbar: boolean) => {
     set((state) => {
       state.widgets[widgetId].isShowToolbar = isShowToolbar;
+    });
+  },
+  updateErrors: (errors: string[]) => {
+    set((state) => {
+      state.errors = errors;
     });
   },
 });

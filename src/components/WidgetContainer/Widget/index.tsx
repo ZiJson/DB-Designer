@@ -2,7 +2,7 @@
 import { Card } from "@/components/ui/card";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "../../ui/button";
-import { GripHorizontal, Maximize2, Minimize2 } from "lucide-react";
+import { GripHorizontal, Maximize2, Minimize2, Minus } from "lucide-react";
 import Draggable from "../../dnd/Draggable";
 import { useWindowSize } from "@uidotdev/usehooks";
 import {
@@ -50,6 +50,7 @@ const Widget = ({
     (state) => state.setWidgetPosition,
   );
   const setIsShowToolbar = useWorkspaceStore((state) => state.setIsShowToolbar);
+  const toggleWidgetHide = useWorkspaceStore((state) => state.toggleWidgetHide);
   const { width: windowWidth, height: windowHeight } = useWindowSize();
   const containerRef = useRef<HTMLDivElement>(null);
   const startPosition = useRef<Position | null>(null);
@@ -150,7 +151,6 @@ const Widget = ({
         className={`no-scrollbar h-full w-full overflow-auto shadow-2xl`}
         ref={containerRef}
         onMouseDown={(e) => {
-          e.preventDefault();
           e.stopPropagation();
         }}
         onMouseMove={onMouseMove}
@@ -182,6 +182,21 @@ const Widget = ({
               strokeWidth={3}
             />
           )}
+        </Button>
+        <Button
+          className="absolute right-[0.5rem] top-1 h-6 w-8"
+          variant="ghost"
+          size="icon"
+          onMouseDown={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+          onClick={() => toggleWidgetHide(widgetId)}
+        >
+          <Minus
+            className="absolute left-1/2 top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2"
+            strokeWidth={3}
+          />
         </Button>
         <GripHorizontal className="absolute left-1/2 top-1 -translate-x-1/2" />
       </Card>
