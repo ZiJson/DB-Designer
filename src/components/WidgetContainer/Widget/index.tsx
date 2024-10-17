@@ -170,6 +170,7 @@ const Widget = ({
             e.stopPropagation();
           }}
           onClick={() => toggletIsExpanded(widgetId)}
+          aria-label="expand"
         >
           {!isExpanded ? (
             <Maximize2
@@ -192,6 +193,7 @@ const Widget = ({
             e.stopPropagation();
           }}
           onClick={() => toggleWidgetHide(widgetId)}
+          aria-label="hide"
         >
           <Minus
             className="absolute left-1/2 top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2"

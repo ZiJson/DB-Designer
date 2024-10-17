@@ -36,7 +36,7 @@ const ExportDialog = () => {
       )}
       <Dialog>
         <DialogTrigger asChild disabled={!!errors.length}>
-          <Button variant="outline" size="icon">
+          <Button variant="outline" size="icon" aria-label="Export">
             <Download className="h-[1.2rem] w-[1.2rem]" />
           </Button>
         </DialogTrigger>

@@ -1,6 +1,7 @@
 import { ImmerStateCreator } from "../workspace-store";
 import { Coordinates } from "@dnd-kit/core/dist/types";
 import { DMMF } from "@prisma/generator-helper";
+import { Files } from "lucide-react";
 
 export type MutableDeep<T> = {
   -readonly [P in keyof T]: MutableDeep<T[P]>;
@@ -8,15 +9,16 @@ export type MutableDeep<T> = {
 
 type TableState = {
   models: MutableDeep<DMMF.Model>[];
-  positions: Map<string, Coordinates>;
+  positions: Record<string, Coordinates | null>;
 };
 
 type TableActions = {
-  getTablePosition: (tableName: string) => Coordinates; //Position
   updateTablePosition: (tableName: string, position: Coordinates) => void;
   refreshTables: (models: DMMF.Document["datamodel"]["models"]) => void;
   addNewTable: () => void;
+  addNewField: (tableName: string) => void;
   removeTable: (tableName: string) => void;
+  removeField: (tableName: string, fieldName: string) => void;
   updateModelName: (tableName: string, name: string) => void;
   updateFieldName: (tableName: string, fieldName: string, name: string) => void;
   updateModelField: (
@@ -261,19 +263,19 @@ const defaultInitState: TableState = {
       isGenerated: false,
     },
   ],
-  positions: new Map<string, Coordinates>(),
+  positions: {},
 };
 
 const defaultField: MutableDeep<DMMF.Field> = {
-  name: "id",
+  name: "_",
   kind: "scalar",
   isList: false,
   isRequired: true,
   isUnique: false,
-  isId: true,
+  isId: false,
   isReadOnly: false,
   hasDefaultValue: false,
-  type: "Int",
+  type: "",
 };
 
 const defaultModel: MutableDeep<DMMF.Model> = {
@@ -292,33 +294,47 @@ export const createTableStore: ImmerStateCreator<TableStore> = (
   store,
 ) => ({
   ...defaultInitState,
-  getTablePosition(tableName) {
-    const position = get().positions.get(tableName);
-    if (!position) {
-      set((state) => {
-        state.positions.set(tableName, { x: 0, y: 0 });
-      });
-      return { x: 0, y: 0 };
-    } else {
-      return position;
-    }
-  },
   updateTablePosition(tableName, position) {
     set((state) => {
-      state.positions.set(tableName, position);
+      state.positions[tableName] = position;
     });
   },
   addNewTable: () => {
     set((state) => {
       state.models.push({
         ...defaultModel,
-        name: `Table ${state.models.length + 1}`,
+        name: `Table${state.models.length + 1}`,
+        fields: [
+          {
+            ...defaultField,
+            name: "id",
+            isId: true,
+            type: "Int",
+          },
+        ],
       });
     });
   },
   removeTable(modelName) {
     set((state) => {
       state.models = state.models.filter((model) => model.name !== modelName);
+      state.positions[modelName] = null;
+      state.models = state.models.map((model) => {
+        model.fields = model.fields.filter((field) => field.type !== modelName);
+        return model;
+      });
+    });
+  },
+  removeField(tableName, fieldName) {
+    set((state) => {
+      state.models = state.models.map((model) => {
+        if (model.name === tableName) {
+          model.fields = model.fields.filter(
+            (field) => field.name !== fieldName,
+          );
+        }
+        return model;
+      });
     });
   },
   refreshTables(models) {
@@ -342,15 +358,14 @@ export const createTableStore: ImmerStateCreator<TableStore> = (
           if (field.type === tableName && field.kind === "object") {
             field.type = name;
             field.relationName = field.relationName?.replace(tableName, name);
-            console.log(field.relationName);
           }
           return field;
         });
         return model;
       });
-      const tempPosition = get().positions.get(tableName)!;
-      state.positions.set(name, tempPosition);
-      state.positions.delete(tableName);
+      const tempPosition = get().positions[tableName]!;
+      state.positions[name] = tempPosition;
+      state.positions[tableName] = null;
     });
   },
   updateFieldName(tableName, fieldName, name) {
@@ -393,6 +408,16 @@ export const createTableStore: ImmerStateCreator<TableStore> = (
             }
             return f;
           });
+        }
+        return model;
+      });
+    });
+  },
+  addNewField(tableName) {
+    set((state) => {
+      state.models = state.models.map((model) => {
+        if (model.name === tableName) {
+          model.fields.push(defaultField);
         }
         return model;
       });

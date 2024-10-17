@@ -3,7 +3,6 @@ import { Completion, CompletionSource } from "@codemirror/autocomplete";
 export const prismaCompletion: CompletionSource = (context) => {
   // 匹配光標前的單詞，包括 @ 符號
   const word = context.matchBefore(/[\w@]*/);
-  console.log(word?.text);
 
   // 如果沒有匹配到或匹配內容為空且沒有顯式補全，返回 null
   if (!word || (word.from === word.to && !context.explicit)) return null;

@@ -41,20 +41,21 @@ export const createCanvasStore: ImmerStateCreator<CanvasStore> = (
       const windowHeight = document.documentElement.clientHeight;
       const windowWidth = document.documentElement.clientWidth;
 
-      const relevantPositions = Array.from(positions.entries())
+      const relevantPositions: Coordinates[] = Object.entries(positions)
         .filter(
-          ([key]) =>
+          ([key, coor]) =>
             models.some((model) => model.name === key) &&
-            (key === modelName || !modelName),
+            (key === modelName || !modelName) &&
+            coor,
         )
         .map(([key, coor]) => {
           const el = document.getElementById(key);
           const { width = 0, height = 0 } = el?.getBoundingClientRect() || {};
           return [
-            coor,
+            coor as Coordinates,
             {
-              x: coor.x + width / canvasScale,
-              y: coor.y + height / canvasScale,
+              x: coor!.x + width / canvasScale,
+              y: coor!.y + height / canvasScale,
             },
           ];
         })

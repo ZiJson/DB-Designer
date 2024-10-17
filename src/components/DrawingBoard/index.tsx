@@ -42,7 +42,7 @@ const Lines = () => {
   }, [models]); // Empty dependency array ensures this runs only once on mount
 
   const findPositionAndWidth = (tableName: string, fieldName?: string) => {
-    const position = positions.get(tableName) || { x: 0, y: 0 };
+    const position = positions[tableName] || { x: 0, y: 0 };
     const ModelElement =
       typeof document !== "undefined"
         ? document.getElementById(tableName)

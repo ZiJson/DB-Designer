@@ -16,10 +16,9 @@ const TableModal = ({ tableData }: Props) => {
   const updateTablePosition = useWorkspaceStore(
     (state) => state.updateTablePosition,
   );
-  const removeTable = useWorkspaceStore((state) => state.removeTable);
   const scale = useWorkspaceStore((state) => state.scale);
-  const position = useWorkspaceStore((state) =>
-    state.getTablePosition(tableData.name),
+  const position = useWorkspaceStore(
+    (state) => state.positions[tableData.name] || { x: 0, y: 0 },
   );
 
   const onDragMove = (event: DragMoveEvent) => {

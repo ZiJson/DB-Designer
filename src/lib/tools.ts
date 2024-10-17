@@ -72,7 +72,7 @@ export function convertDMMFToPrismaSchema(datamodel: {
     schema += " {\n";
 
     for (const field of model.fields) {
-      let fieldDefinition = `\t${field.name} \t${field.type}`;
+      let fieldDefinition = `\t${field.name} \t ${field.type}`;
 
       // Check if the field is a list
       if (field.isList) {
@@ -99,17 +99,17 @@ export function convertDMMFToPrismaSchema(datamodel: {
 
       // Add relation handling
       if (field.relationName) {
-        let relationAttribute = `@relation("${field.relationName}"`;
+        let relationAttribute = `@relation(`;
         const relFields: string[] = [];
         if (field.relationFromFields && field.relationFromFields.length > 0)
           relFields.push(`fields: [${field.relationFromFields.join(", ")}]`);
         if (field.relationToFields && field.relationToFields.length > 0)
           relFields.push(`references: [${field.relationToFields.join(", ")}]`);
         if (relFields.length > 0) {
-          relationAttribute += `, ${relFields.join(", ")}`;
+          relationAttribute += `${relFields.join(", ")}`;
+          relationAttribute += ")";
+          attributes.push(relationAttribute);
         }
-        relationAttribute += ")";
-        attributes.push(relationAttribute);
       }
 
       // If any attributes are added, append them to the field definition
@@ -138,6 +138,5 @@ export function convertDMMFToPrismaSchema(datamodel: {
 
     schema += "}\n\n";
   }
-
   return schema.trim();
 }

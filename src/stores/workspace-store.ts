@@ -24,23 +24,22 @@ export const createWorkspaceStore = (
 ) => {
   return createStore<WorkspaceStore>()(
     devtools(
-      // persist(
-      immer((...args) => ({
-        ...initState,
-        ...createCanvasStore(...args),
-        ...createTableStore(...args),
-        ...createDashboardStore(...args),
-        ...createWidgetStore(...args),
-      })),
-      {
-        name: "workspace-store",
-      },
-      // ),
+      persist(
+        immer((...args) => ({
+          ...initState,
+          ...createCanvasStore(...args),
+          ...createTableStore(...args),
+          ...createDashboardStore(...args),
+          ...createWidgetStore(...args),
+        })),
+        {
+          name: "workspace-store",
+        },
+      ),
     ),
   );
 };
 
-enableMapSet();
 export type ImmerStateCreator<T extends Partial<WorkspaceStore>> = StateCreator<
   WorkspaceStore,
   [["zustand/immer", never], never],

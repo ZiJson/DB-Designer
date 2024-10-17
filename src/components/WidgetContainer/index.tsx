@@ -42,7 +42,12 @@ const WidgetContainer = ({ children }: { children: React.ReactNode }) => {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        <Button variant="outline" size="icon" onClick={() => resizeCanvas()}>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => resizeCanvas()}
+          aria-label="resize canvas"
+        >
           <Scaling className="h-[1.2rem] w-[1.2rem]" />
         </Button>
         <ExportDialog />
@@ -54,6 +59,7 @@ const WidgetContainer = ({ children }: { children: React.ReactNode }) => {
             (state) => !state.widgets["codeEditor"].hide,
           )}
           onClick={() => toggleWidgetHide("codeEditor")}
+          aria-label="toggle code editor"
         >
           <CodeXml className="h-[1.2rem] w-[1.2rem]" />
         </Toggle>
@@ -64,6 +70,7 @@ const WidgetContainer = ({ children }: { children: React.ReactNode }) => {
             (state) => !state.widgets["noCodeEditor"].hide,
           )}
           onClick={() => toggleWidgetHide("noCodeEditor")}
+          aria-label="toggle no code editor"
         >
           <Settings2 className="h-[1.2rem] w-[1.2rem]" />
         </Toggle>
