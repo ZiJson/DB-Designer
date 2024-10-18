@@ -20,7 +20,7 @@ export type EditorStore = EditorState & EditorActions;
 let editorViewRef: EditorView | null = null;
 
 const defaultInitState: EditorState = {
-  history: [""],
+  history: [],
   currentIndex: 0,
 };
 

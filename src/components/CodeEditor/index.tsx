@@ -19,9 +19,10 @@ const CodeEditor = (props: ReactCodeMirrorProps) => {
   const editorRef = useRef<ReactCodeMirrorRef>(null);
   const setEditorView = useWorkspaceStore((state) => state.setEditorView);
   const updateContent = useWorkspaceStore((state) => state.updateContent);
-  const schema = useWorkspaceStore((state) =>
-    state.datasource +
-    convertDMMFToPrismaSchema({ models: state.models, enums: state.enums })
+  const schema = useWorkspaceStore(
+    (state) =>
+      state.datasource +
+      convertDMMFToPrismaSchema({ models: state.models, enums: state.enums }),
   );
 
   const { theme, systemTheme } = useTheme();
@@ -32,7 +33,7 @@ const CodeEditor = (props: ReactCodeMirrorProps) => {
     refreshTables(dmmf.datamodel);
   };
 
-  const handleChange = (value: string, viewUpdate: ViewUpdate) => {
+  const onChange = (value: string) => {
     updateContent(value);
   };
 
@@ -40,14 +41,15 @@ const CodeEditor = (props: ReactCodeMirrorProps) => {
     <div>
       <CodeMirror
         onCreateEditor={(view: EditorView) => setEditorView(view)}
-        onChange={handleChange}
         {...props}
         ref={editorRef}
         value={schema}
         theme={theme === "system" ? systemTheme : (theme as "light" | "dark")}
         extensions={[
           prismaLang,
-          linter(prismaLinter(onSuccess, updateErrors, setDatasource)),
+          linter(
+            prismaLinter(onSuccess, updateErrors, setDatasource, onChange),
+          ),
           lintGutter({}),
           autocompletion({ override: [prismaCompletion] }),
         ]}
