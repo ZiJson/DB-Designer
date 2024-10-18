@@ -11,13 +11,12 @@ export type WorkspaceState = {};
 
 export type WorkspaceActions = {};
 
-export type WorkspaceStore =
-  & WorkspaceState
-  & WorkspaceActions
-  & CanvasStore
-  & TableStore
-  & WidgetStore
-  & EditorStore;
+export type WorkspaceStore = WorkspaceState &
+  WorkspaceActions &
+  CanvasStore &
+  TableStore &
+  WidgetStore &
+  EditorStore;
 
 export const defaultInitState: WorkspaceState = {};
 export const createWorkspaceStore = (
@@ -35,6 +34,15 @@ export const createWorkspaceStore = (
         })),
         {
           name: "workspace-store",
+          partialize: (state) => {
+            return {
+              position: state.position,
+              positions: state.positions,
+              scale: state.scale,
+              models: state.models,
+              enums: state.enums,
+            };
+          },
         },
       ),
     ),
