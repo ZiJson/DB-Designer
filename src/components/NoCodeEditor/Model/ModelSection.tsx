@@ -1,6 +1,6 @@
 
   import { useWorkspaceStore } from "@/providers/workspace-store-provider";
-  import { useState } from "react";
+  import { memo, useState } from "react";
   import { Check,  Settings, Trash} from "lucide-react";
   
   import { Button } from "@/components/ui/button";
@@ -31,6 +31,7 @@ interface ModelSectionProps {
     const [popoverOpen, setPopoverOpen] = useState(false);
   
     const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        e.preventDefault();
       const newName = e.target.value;
       updateModelName(model.name, newName); // 更新全域狀態
     };
@@ -112,4 +113,4 @@ interface ModelSectionProps {
     );
   };
 
-  export default ModelSection;
+  export default memo(ModelSection);

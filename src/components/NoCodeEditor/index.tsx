@@ -49,21 +49,22 @@ const NoCodeEditor = () => {
   const addNewTable = useWorkspaceStore((state) => state.addNewTable);
   const addNewEnum = useWorkspaceStore((state) => state.addNewEnum);
   const addNewEnumValue = useWorkspaceStore((state) => state.addNewEnumValue);
-  const [editingValue, setEditingValue] = useState<string | null>(null);
+  const [editingIndex, setEditingIndex] = useState<number| null>(null);
   const [activeValue, setActiveValue] = useState("");
 
   useEffect(() => {
-    if (editingValue !== null) {
+    if (editingIndex !== null) {
       setTimeout(() => {
-        document.querySelector(`item-${editingValue}`)?.scrollIntoView({
+        document.querySelector(`item-${editingIndex}`)?.scrollIntoView({
           behavior: "smooth",
           block: "start",
         });
       }, 150);
     }
-  }, [editingValue]);
+  }, [editingIndex]);
 
   const onValueChange = (value: string) => {
+    console.log("value", value);
     setTimeout(() => {
       document.querySelector(`.item-${value}`)?.scrollIntoView({
         behavior: "smooth",
@@ -72,8 +73,9 @@ const NoCodeEditor = () => {
     }, 150);
     setActiveValue(value);
     resizeCanvas(value);
-    !value && setEditingValue(null);
-    value !== editingValue && setEditingValue(null);
+    !value && setEditingIndex(null);
+    const index = [...models, ...enums].findIndex((model) => model.name === value);
+    index !== editingIndex && setEditingIndex(null);
   };
   return (
     <div className="flex h-full w-full justify-between overflow-auto bg-card px-5">
@@ -88,18 +90,18 @@ const NoCodeEditor = () => {
         {models.map((model, modelIndex) => (
           <AccordionItem
             key={modelIndex}
-            value={model.name}
+            value={modelIndex.toString()}
             className={`group item-${models[modelIndex].name}`}
           >
             <AccordionTrigger className="py-3">
               <ModelSection
                 modelIndex={modelIndex}
                 onEdit={(bool: boolean) =>
-                  setEditingValue(bool ? model.name : null)
+                  setEditingIndex(bool ? modelIndex : null)
                 }
-                isEditing={editingValue === model.name}
+                isEditing={editingIndex === modelIndex}
                 onExpand={(bool: boolean) => {
-                  setActiveValue(bool ? model.name : "");
+                  setActiveValue(bool ? modelIndex.toString() : "");
                 }}
               />
             </AccordionTrigger>
@@ -109,11 +111,11 @@ const NoCodeEditor = () => {
                   <FieldSection
                     modelIndex={modelIndex}
                     fieldIndex={fieldIndex}
-                    isEditing={editingValue === model.name}
+                    isEditing={editingIndex === modelIndex}
                   />
                 </div>
               ))}
-              {editingValue === model.name && (
+              {editingIndex === modelIndex && (
                 <Button
                   variant="outline"
                   className="w-full"
@@ -137,26 +139,26 @@ const NoCodeEditor = () => {
         {enums.map((enumData, enumIndex) => (
           <AccordionItem
             key={enumIndex}
-            value={enumData.name}
+            value={(enumIndex+models.length).toString()}
             className={`group item-${enumData.name}`}
           >
             <AccordionTrigger className="py-3">
               <EnumSection enumIndex={enumIndex} onEdit={(bool: boolean) =>
-                  setEditingValue(bool ? enumData.name : null)
+                  setEditingIndex(bool ? enumIndex+models.length : null)
                 }
-                isEditing={editingValue === enumData.name}
+                isEditing={editingIndex === enumIndex+models.length}
                 onExpand={(bool: boolean) => {
-                  setActiveValue(bool ? enumData.name : "");
+                  setActiveValue(bool ? (enumIndex+models.length).toString() : "");
                 }} />
             </AccordionTrigger>
             <AccordionContent className="pl-5">
               {enumData.values.map((value, valueIndex) => (
                 <div key={valueIndex} className="w-full border-t py-3">
 
-              <ValueSection enumIndex={enumIndex} valueIndex={valueIndex} isEditing={editingValue === enumData.name}/>
+              <ValueSection enumIndex={enumIndex} valueIndex={valueIndex} isEditing={editingIndex === enumIndex+models.length}/>
                 </div>
               ))}
-              {editingValue === enumData.name && (
+              {editingIndex === enumIndex+models.length && (
                 <Button
                   variant="outline"
                   className="w-full"

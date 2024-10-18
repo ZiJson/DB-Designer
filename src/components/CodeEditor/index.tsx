@@ -1,4 +1,5 @@
-import CodeMirror, { ReactCodeMirrorProps } from "@uiw/react-codemirror";
+import React, { useRef } from "react";
+import CodeMirror, { ReactCodeMirrorRef, ReactCodeMirrorProps, ViewUpdate, EditorView } from "@uiw/react-codemirror";
 import { StreamLanguage } from "@codemirror/language";
 import { prismaCompletion } from "./mention";
 import { linter, lintGutter } from "@codemirror/lint";
@@ -9,9 +10,13 @@ import { useWorkspaceStore } from "@/providers/workspace-store-provider";
 import { useTheme } from "next-themes";
 import { convertDMMFToPrismaSchema } from "@/lib/tools";
 
+
 const CodeEditor = (props: ReactCodeMirrorProps) => {
+  const editorRef = useRef<ReactCodeMirrorRef>(null);
+  const setEditorView = useWorkspaceStore(state => state.setEditorView);
+  const updateContent = useWorkspaceStore(state => state.updateContent);
   const schema = useWorkspaceStore((state) =>
-    state.datasource+convertDMMFToPrismaSchema({ models: state.models, enums: state.enums }),
+    state.datasource + convertDMMFToPrismaSchema({ models: state.models, enums: state.enums })
   );
 
   const { theme, systemTheme } = useTheme();
@@ -21,35 +26,46 @@ const CodeEditor = (props: ReactCodeMirrorProps) => {
   const onSuccess = (dmmf: DMMF.Document) => {
     refreshTables(dmmf.datamodel);
   };
+
+  const handleChange = (value: string, viewUpdate: ViewUpdate) => {
+    updateContent(value);
+  };
+
   return (
-    <CodeMirror
-      {...props}
-      value={schema}
-      theme={theme === "system" ? systemTheme : (theme as "light" | "dark")}
-      extensions={[
-        prismaLang,
-        linter(prismaLinter(onSuccess, updateErrors, setDatasource)),
-        lintGutter({}),
-        autocompletion({ override: [prismaCompletion] }),
-      ]}
-    />
+    <div>
+      <CodeMirror
+      onCreateEditor={(view: EditorView) => setEditorView(view)}
+      onChange={handleChange}
+        {...props}
+        ref={editorRef}
+        value={schema}
+        theme={theme === "system" ? systemTheme : (theme as "light" | "dark")}
+        extensions={[
+          prismaLang,
+          linter(prismaLinter(onSuccess, updateErrors, setDatasource)),
+          lintGutter({}),
+          autocompletion({ override: [prismaCompletion] }),
+        ]}
+      />
+    </div>
   );
 };
+
 export default CodeEditor;
 
 const prismaLang = StreamLanguage.define({
   token: (stream) => {
-    if (stream.match(/model|datasource|generator|enum/)) return "keyword"; // 关键字
-    if (stream.match(/@id|@default|@unique|@relation/)) return "attribute"; // 装饰器
-    if (stream.match(/ [A-Z][a-zA-Z0-9_]*/)) return "type"; // 数据类型或模型名称
-    if (stream.match(/"[^"]*"/)) return "string"; // 字符串
-    if (stream.match(/[0-9]+/)) return "number"; // 数字
-    if (stream.match(/[=]/)) return "operator"; // 操作符
-    if (stream.match(/env|provider|url|client/)) return "variableName"; // 变量名称
-    if (stream.match(/true|false/)) return "constant"; // 布尔常量
-    if (stream.match(/[{}[\]()]/)) return "bracket"; // 括号
-    if (stream.match(/\/\/.*/)) return "comment"; // 注释
+    if (stream.match(/model|datasource|generator|enum/)) return "keyword";
+    if (stream.match(/@id|@default|@unique|@relation/)) return "attribute";
+    if (stream.match(/ [A-Z][a-zA-Z0-9_]*/)) return "type";
+    if (stream.match(/"[^"]*"/)) return "string";
+    if (stream.match(/[0-9]+/)) return "number";
+    if (stream.match(/[=]/)) return "operator";
+    if (stream.match(/env|provider|url|client/)) return "variableName";
+    if (stream.match(/true|false/)) return "constant";
+    if (stream.match(/[{}[\]()]/)) return "bracket";
+    if (stream.match(/\/\/.*/)) return "comment";
     stream.next();
-    return null; // 其他默认无高亮
+    return null;
   },
 });

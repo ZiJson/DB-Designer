@@ -9,16 +9,21 @@ import {
 import { Toggle } from "@/components/ui/toggle";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
-import { CodeXml, MoonIcon, Scaling, Settings2, SunIcon } from "lucide-react";
+import { CodeXml, MoonIcon,  Redo2, Scaling, Settings2, SunIcon,  Undo2 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useWorkspaceStore } from "@/providers/workspace-store-provider";
 import { Separator } from "@/components/ui/separator";
 import ExportDialog from "./ExportDialog";
 
+
 const WidgetContainer = ({ children }: { children: React.ReactNode }) => {
   const { setTheme } = useTheme();
   const resizeCanvas = useWorkspaceStore((state) => state.resizeCanvas);
   const toggleWidgetHide = useWorkspaceStore((state) => state.toggleWidgetHide);
+  const undo = useWorkspaceStore((state) => state.undo);
+  const redo = useWorkspaceStore((state) => state.redo);
+  const canUndo = useWorkspaceStore((state) => state.history.length > 1 && state.currentIndex > 0);
+  const canRedo = useWorkspaceStore((state) => state.history.length > 1 && state.currentIndex < state.history.length - 1);
   return (
     <Fragment>
       <Card className="absolute left-1/2 top-[20px] z-30 flex -translate-x-1/2 items-center gap-2 rounded-xl p-2 shadow-lg transition-all">
@@ -74,6 +79,12 @@ const WidgetContainer = ({ children }: { children: React.ReactNode }) => {
         >
           <Settings2 className="h-[1.2rem] w-[1.2rem]" />
         </Toggle>
+        <Button variant="outline" size="icon" onClick={() => undo()} disabled={!canUndo}>
+        <Undo2 className="h-4 w-4"/>
+        </Button>
+        <Button variant="outline" size="icon" onClick={() => redo()} disabled={!canRedo}>
+        <Redo2 className="h-4 w-4"/>
+        </Button>
       </Card>
       {children}
     </Fragment>

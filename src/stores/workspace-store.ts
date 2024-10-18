@@ -4,6 +4,8 @@ import { immer } from "zustand/middleware/immer";
 import { CanvasStore, createCanvasStore } from "./CanvasStore";
 import { createTableStore, TableStore } from "./TableStore";
 import { createWidgetStore, WidgetStore } from "./WidgetStore";
+import { EditorState } from "@uiw/react-codemirror";
+import { createEditorStore, EditorStore } from "./EditorStore";
 
 export type WorkspaceState = {};
 
@@ -13,7 +15,7 @@ export type WorkspaceStore = WorkspaceState &
   WorkspaceActions &
   CanvasStore &
   TableStore &
-  WidgetStore 
+  WidgetStore & EditorStore
 
 export const defaultInitState: WorkspaceState = {};
 export const createWorkspaceStore = (
@@ -27,6 +29,7 @@ export const createWorkspaceStore = (
           ...createCanvasStore(...args),
           ...createTableStore(...args),
           ...createWidgetStore(...args),
+          ...createEditorStore(...args),
         })),
         {
           name: "workspace-store",
