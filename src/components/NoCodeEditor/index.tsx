@@ -15,9 +15,9 @@ import {
   SelectGroup,
   SelectItem,
   SelectLabel,
+  SelectSeparator,
   SelectTrigger,
   SelectValue,
-  SelectSeparator,
 } from "@/components/ui/select";
 import { Toggle } from "@/components/ui/toggle";
 import { ScalarTypes } from "@/types/Database";
@@ -49,7 +49,7 @@ const NoCodeEditor = () => {
   const addNewTable = useWorkspaceStore((state) => state.addNewTable);
   const addNewEnum = useWorkspaceStore((state) => state.addNewEnum);
   const addNewEnumValue = useWorkspaceStore((state) => state.addNewEnumValue);
-  const [editingIndex, setEditingIndex] = useState<number| null>(null);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [activeValue, setActiveValue] = useState("");
 
   useEffect(() => {
@@ -74,7 +74,9 @@ const NoCodeEditor = () => {
     setActiveValue(value);
     resizeCanvas(value);
     !value && setEditingIndex(null);
-    const index = [...models, ...enums].findIndex((model) => model.name === value);
+    const index = [...models, ...enums].findIndex((model) =>
+      model.name === value
+    );
     index !== editingIndex && setEditingIndex(null);
   };
   return (
@@ -85,8 +87,8 @@ const NoCodeEditor = () => {
         className="w-full"
         onValueChange={onValueChange}
         value={activeValue}
-      > 
-      <div className="w-full py-3">Models</div>
+      >
+        <div className="w-full py-3">Models</div>
         {models.map((model, modelIndex) => (
           <AccordionItem
             key={modelIndex}
@@ -97,8 +99,7 @@ const NoCodeEditor = () => {
               <ModelSection
                 modelIndex={modelIndex}
                 onEdit={(bool: boolean) =>
-                  setEditingIndex(bool ? modelIndex : null)
-                }
+                  setEditingIndex(bool ? modelIndex : null)}
                 isEditing={editingIndex === modelIndex}
                 onExpand={(bool: boolean) => {
                   setActiveValue(bool ? modelIndex.toString() : "");
@@ -134,31 +135,38 @@ const NoCodeEditor = () => {
         >
           Add Table
         </Button>
-      <div className="w-full pb-3 pt-4">Enums</div>
+        <div className="w-full pb-3 pt-4">Enums</div>
 
         {enums.map((enumData, enumIndex) => (
           <AccordionItem
             key={enumIndex}
-            value={(enumIndex+models.length).toString()}
+            value={(enumIndex + models.length).toString()}
             className={`group item-${enumData.name}`}
           >
             <AccordionTrigger className="py-3">
-              <EnumSection enumIndex={enumIndex} onEdit={(bool: boolean) =>
-                  setEditingIndex(bool ? enumIndex+models.length : null)
-                }
-                isEditing={editingIndex === enumIndex+models.length}
+              <EnumSection
+                enumIndex={enumIndex}
+                onEdit={(bool: boolean) =>
+                  setEditingIndex(bool ? enumIndex + models.length : null)}
+                isEditing={editingIndex === enumIndex + models.length}
                 onExpand={(bool: boolean) => {
-                  setActiveValue(bool ? (enumIndex+models.length).toString() : "");
-                }} />
+                  setActiveValue(
+                    bool ? (enumIndex + models.length).toString() : "",
+                  );
+                }}
+              />
             </AccordionTrigger>
             <AccordionContent className="pl-5">
               {enumData.values.map((value, valueIndex) => (
                 <div key={valueIndex} className="w-full border-t py-3">
-
-              <ValueSection enumIndex={enumIndex} valueIndex={valueIndex} isEditing={editingIndex === enumIndex+models.length}/>
+                  <ValueSection
+                    enumIndex={enumIndex}
+                    valueIndex={valueIndex}
+                    isEditing={editingIndex === enumIndex + models.length}
+                  />
                 </div>
               ))}
-              {editingIndex === enumIndex+models.length && (
+              {editingIndex === enumIndex + models.length && (
                 <Button
                   variant="outline"
                   className="w-full"
@@ -167,7 +175,7 @@ const NoCodeEditor = () => {
                   Add value
                 </Button>
               )}
-             </AccordionContent>
+            </AccordionContent>
           </AccordionItem>
         ))}
         <Button
@@ -182,5 +190,3 @@ const NoCodeEditor = () => {
   );
 };
 export default NoCodeEditor;
-
-

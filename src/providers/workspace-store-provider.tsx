@@ -1,16 +1,17 @@
 "use client";
 
-import { type ReactNode, createContext, useRef, useContext } from "react";
+import { createContext, type ReactNode, useContext, useRef } from "react";
 import { type StoreApi, useStore } from "zustand";
 import { useStoreWithEqualityFn } from "zustand/traditional";
 
 import {
-  type WorkspaceStore,
   createWorkspaceStore,
+  type WorkspaceStore,
 } from "@/stores/workspace-store";
 
-export const WorkspaceStoreContext =
-  createContext<StoreApi<WorkspaceStore> | null>(null);
+export const WorkspaceStoreContext = createContext<
+  StoreApi<WorkspaceStore> | null
+>(null);
 
 export interface WorkspaceStoreProviderProps {
   children: ReactNode;

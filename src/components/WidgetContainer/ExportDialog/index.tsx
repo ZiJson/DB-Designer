@@ -20,7 +20,7 @@ const ExportDialog = () => {
   const { theme, systemTheme } = useTheme();
   const errors = useWorkspaceStore((state) => state.errors);
   const schema = useWorkspaceStore((state) =>
-    convertDMMFToPrismaSchema({ models: state.models, enums: state.enums }),
+    convertDMMFToPrismaSchema({ models: state.models, enums: state.enums })
   );
 
   const handleCopy = () => {

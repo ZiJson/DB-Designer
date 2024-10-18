@@ -1,4 +1,4 @@
-import { type TableModal, type Field } from "@/types/Table";
+import { type Field, type TableModal } from "@/types/Table";
 import Draggable from "../dnd/Draggable";
 import { useWorkspaceStore } from "@/providers/workspace-store-provider";
 import { DragMoveEvent, DragStartEvent, useDraggable } from "@dnd-kit/core";

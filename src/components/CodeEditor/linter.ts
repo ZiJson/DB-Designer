@@ -1,5 +1,5 @@
 import { schemaToDmmf } from "@/actions/dmmf";
-import { linter, lintGutter, Diagnostic } from "@codemirror/lint";
+import { Diagnostic, linter, lintGutter } from "@codemirror/lint";
 import { EditorView } from "@codemirror/view";
 import { DMMF } from "@prisma/generator-helper";
 import { on } from "events";
@@ -14,50 +14,49 @@ interface CustomLintResult {
 }
 
 // Custom linter function
-export const prismaLinter =
-  (
-    callback: (dmmf: DMMF.Document) => void,
-    onError: (error: string[]) => void,
-    setDatasource: (datasource:string) => void
-  ) =>
-  async (view: EditorView) => {
-    const diagnostics: Diagnostic[] = [];
-    const text = view.state.doc.toString();
-    const datasource = text.split('model')[0]
-    setDatasource(datasource)
-    const addDiagnostic = (result: CustomLintResult) => {
-      diagnostics.push({
-        from: result.from,
-        to: result.to,
-        severity: result.severity,
-        message: result.message,
-      });
-    };
-
-    const { dmmf, error } = await schemaToDmmf(text);
-    onError([]);
-    if (error) {
-      const errors = splitPrismaErrors(error);
-      onError(errors.map((error) => error.message));
-      errors.forEach((error) => {
-        addDiagnostic({
-          ...getLineIndices(text, error.lineNumber),
-          severity: "error",
-          message: error.message,
-        });
-        toast.error(error.message, {
-          duration: 5000,
-          cancel: {
-            label: "Cancel",
-            onClick: () => {},
-          },
-        });
-      });
-    } else {
-      callback(dmmf as DMMF.Document);
-    }
-    return diagnostics;
+export const prismaLinter = (
+  callback: (dmmf: DMMF.Document) => void,
+  onError: (error: string[]) => void,
+  setDatasource: (datasource: string) => void,
+) =>
+async (view: EditorView) => {
+  const diagnostics: Diagnostic[] = [];
+  const text = view.state.doc.toString();
+  const datasource = text.split("model")[0];
+  setDatasource(datasource);
+  const addDiagnostic = (result: CustomLintResult) => {
+    diagnostics.push({
+      from: result.from,
+      to: result.to,
+      severity: result.severity,
+      message: result.message,
+    });
   };
+
+  const { dmmf, error } = await schemaToDmmf(text);
+  onError([]);
+  if (error) {
+    const errors = splitPrismaErrors(error);
+    onError(errors.map((error) => error.message));
+    errors.forEach((error) => {
+      addDiagnostic({
+        ...getLineIndices(text, error.lineNumber),
+        severity: "error",
+        message: error.message,
+      });
+      toast.error(error.message, {
+        duration: 5000,
+        cancel: {
+          label: "Cancel",
+          onClick: () => {},
+        },
+      });
+    });
+  } else {
+    callback(dmmf as DMMF.Document);
+  }
+  return diagnostics;
+};
 
 function splitPrismaErrors(rawError: string): {
   message: string;
@@ -104,4 +103,3 @@ function getLineIndices(text: string, lineNumber: number) {
 
   return { from: fromIndex, to: toIndex };
 }
-

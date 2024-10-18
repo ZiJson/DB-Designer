@@ -1,5 +1,10 @@
 import React, { useRef } from "react";
-import CodeMirror, { ReactCodeMirrorRef, ReactCodeMirrorProps, ViewUpdate, EditorView } from "@uiw/react-codemirror";
+import CodeMirror, {
+  EditorView,
+  ReactCodeMirrorProps,
+  ReactCodeMirrorRef,
+  ViewUpdate,
+} from "@uiw/react-codemirror";
 import { StreamLanguage } from "@codemirror/language";
 import { prismaCompletion } from "./mention";
 import { linter, lintGutter } from "@codemirror/lint";
@@ -10,13 +15,13 @@ import { useWorkspaceStore } from "@/providers/workspace-store-provider";
 import { useTheme } from "next-themes";
 import { convertDMMFToPrismaSchema } from "@/lib/tools";
 
-
 const CodeEditor = (props: ReactCodeMirrorProps) => {
   const editorRef = useRef<ReactCodeMirrorRef>(null);
-  const setEditorView = useWorkspaceStore(state => state.setEditorView);
-  const updateContent = useWorkspaceStore(state => state.updateContent);
+  const setEditorView = useWorkspaceStore((state) => state.setEditorView);
+  const updateContent = useWorkspaceStore((state) => state.updateContent);
   const schema = useWorkspaceStore((state) =>
-    state.datasource + convertDMMFToPrismaSchema({ models: state.models, enums: state.enums })
+    state.datasource +
+    convertDMMFToPrismaSchema({ models: state.models, enums: state.enums })
   );
 
   const { theme, systemTheme } = useTheme();
@@ -34,8 +39,8 @@ const CodeEditor = (props: ReactCodeMirrorProps) => {
   return (
     <div>
       <CodeMirror
-      onCreateEditor={(view: EditorView) => setEditorView(view)}
-      onChange={handleChange}
+        onCreateEditor={(view: EditorView) => setEditorView(view)}
+        onChange={handleChange}
         {...props}
         ref={editorRef}
         value={schema}

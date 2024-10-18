@@ -1,66 +1,66 @@
+import { useWorkspaceStore } from "@/providers/workspace-store-provider";
+import { Ellipsis, KeyRound, X } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Toggle } from "@/components/ui/toggle";
+import { ScalarTypes } from "@/types/Database";
 
-  import { useWorkspaceStore } from "@/providers/workspace-store-provider";
-  import {  Ellipsis, KeyRound,  X } from "lucide-react";
-  import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectTrigger,
-    SelectValue,
-    SelectSeparator,
-  } from "@/components/ui/select";
-  import { Toggle } from "@/components/ui/toggle";
-  import { ScalarTypes } from "@/types/Database";
-  
-  import { Button } from "@/components/ui/button";
-  import {
-    DropdownMenu,
-    DropdownMenuCheckboxItem,
-    DropdownMenuContent,
-    DropdownMenuTrigger,
-  } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 interface FieldSectionProps {
-    modelIndex: number;
-    fieldIndex: number;
-    isEditing: boolean;
-  }
-  
-  const FieldSection = ({
-    modelIndex,
-    fieldIndex,
-    isEditing,
-  }: FieldSectionProps) => {
-    const modelName = useWorkspaceStore((state) => state.models[modelIndex].name);
-    const objectTypes = useWorkspaceStore((state) =>
-      state.models.map((model) => model.name),
-    );
-    const field = useWorkspaceStore(
-      (state) => state.models[modelIndex].fields[fieldIndex],
-    );
-    const updateFieldName = useWorkspaceStore((state) => state.updateFieldName);
-    const updateModelField = useWorkspaceStore((state) => state.updateModelField);
-    const removeField = useWorkspaceStore((state) => state.removeField);
-  
-    const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newName = e.target.value;
-      updateFieldName(modelName, field.name, newName); // 更新全域狀態
-    };
-  
-    const handleNormalChange = (value: string) => {
-      updateModelField(modelName, field.name, { ...field, type: value }); // 更新全域狀態
-    };
-  
-    const handleOptionChange = (key: string) => (value: boolean) => {
-      updateModelField(modelName, field.name, { ...field, [key]: value }); // 更新全域狀態
-    };
-  
-    return (
-      <div className="flex h-full w-full items-center justify-between pr-1">
-        {isEditing ? (
+  modelIndex: number;
+  fieldIndex: number;
+  isEditing: boolean;
+}
+
+const FieldSection = ({
+  modelIndex,
+  fieldIndex,
+  isEditing,
+}: FieldSectionProps) => {
+  const modelName = useWorkspaceStore((state) => state.models[modelIndex].name);
+  const objectTypes = useWorkspaceStore((state) =>
+    state.models.map((model) => model.name)
+  );
+  const field = useWorkspaceStore(
+    (state) => state.models[modelIndex].fields[fieldIndex],
+  );
+  const updateFieldName = useWorkspaceStore((state) => state.updateFieldName);
+  const updateModelField = useWorkspaceStore((state) => state.updateModelField);
+  const removeField = useWorkspaceStore((state) => state.removeField);
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newName = e.target.value;
+    updateFieldName(modelName, field.name, newName); // 更新全域狀態
+  };
+
+  const handleNormalChange = (value: string) => {
+    updateModelField(modelName, field.name, { ...field, type: value }); // 更新全域狀態
+  };
+
+  const handleOptionChange = (key: string) => (value: boolean) => {
+    updateModelField(modelName, field.name, { ...field, [key]: value }); // 更新全域狀態
+  };
+
+  return (
+    <div className="flex h-full w-full items-center justify-between pr-1">
+      {isEditing
+        ? (
           <>
             <div className="flex items-center gap-2">
               <Input
@@ -148,7 +148,8 @@ interface FieldSectionProps {
               </Button>
             </div>
           </>
-        ) : (
+        )
+        : (
           <>
             <Badge variant="secondary" className="rounded-md">
               {field.name}
@@ -158,10 +159,10 @@ interface FieldSectionProps {
             </Badge>
           </>
         )}
-      </div>
-    );
-  };
+    </div>
+  );
+};
 
-  export default FieldSection;
-  
-  const scalarTypes = Object.values(ScalarTypes);
+export default FieldSection;
+
+const scalarTypes = Object.values(ScalarTypes);

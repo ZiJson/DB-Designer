@@ -34,7 +34,7 @@ export const createCanvasStore: ImmerStateCreator<CanvasStore> = (
     }),
   resizeCanvas: (tableName?: string) => {
     set((state) => {
-      const { positions, scale: canvasScale, models,enums } = get();
+      const { positions, scale: canvasScale, models, enums } = get();
 
       if (typeof document === "undefined") return;
 
@@ -44,7 +44,7 @@ export const createCanvasStore: ImmerStateCreator<CanvasStore> = (
       const relevantPositions: Coordinates[] = Object.entries(positions)
         .filter(
           ([key, coor]) =>
-            [...models,...enums].some((table) => table.name === key) &&
+            [...models, ...enums].some((table) => table.name === key) &&
             (key === tableName || !tableName) &&
             coor,
         )

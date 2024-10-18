@@ -18,7 +18,9 @@ const ConnectLine = ({ p1, p2, mode, title }: Props) => {
 
   const minLength = 50;
   const path = getPath[mode](p1, p2);
-  const viewBox = `0 ${-strokeWidth / 2}  ${width + strokeWidth / 2 + (mode === CONNECT_MODE.SAME_SIDE ? minLength : 0)} ${height + strokeWidth}`;
+  const viewBox = `0 ${-strokeWidth / 2}  ${
+    width + strokeWidth / 2 + (mode === CONNECT_MODE.SAME_SIDE ? minLength : 0)
+  } ${height + strokeWidth}`;
 
   const positionStyle = {
     top: Math.min(p1.y, p2.y),
@@ -27,11 +29,9 @@ const ConnectLine = ({ p1, p2, mode, title }: Props) => {
   return (
     <>
       <Svg
-        width={
-          width +
+        width={width +
           strokeWidth +
-          (mode === CONNECT_MODE.SAME_SIDE ? minLength : 0)
-        }
+          (mode === CONNECT_MODE.SAME_SIDE ? minLength : 0)}
         height={height + strokeWidth}
         viewBox={viewBox}
         className={`absolute -z-10 text-primary/60 drop-shadow-2xl ${
@@ -47,18 +47,19 @@ const ConnectLine = ({ p1, p2, mode, title }: Props) => {
           strokeDasharray: mode === CONNECT_MODE.STRAIGHT ? "5,10" : "",
         })}
       </Svg>
-      {title&&<Badge
-        className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-lg text-xs`}
-        style={{
-          top: positionStyle.top + height / 2,
-          left:
-            mode === CONNECT_MODE.SAME_SIDE
+      {title && (
+        <Badge
+          className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-lg text-xs`}
+          style={{
+            top: positionStyle.top + height / 2,
+            left: mode === CONNECT_MODE.SAME_SIDE
               ? positionStyle.left + width + minLength
               : positionStyle.left + width / 2,
-        }}
-      >
-        {title}
-      </Badge>}
+          }}
+        >
+          {title}
+        </Badge>
+      )}
     </>
   );
 };

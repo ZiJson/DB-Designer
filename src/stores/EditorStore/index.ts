@@ -1,6 +1,6 @@
 import { ImmerStateCreator } from "../workspace-store";
 import { EditorView, ReactCodeMirrorRef } from "@uiw/react-codemirror";
-import { undo, redo } from "@codemirror/commands";
+import { redo, undo } from "@codemirror/commands";
 
 type EditorState = {
   history: string[];
@@ -20,11 +20,14 @@ export type EditorStore = EditorState & EditorActions;
 let editorViewRef: EditorView | null = null;
 
 const defaultInitState: EditorState = {
-  history: [''],
+  history: [""],
   currentIndex: 0,
 };
 
-export const createEditorStore: ImmerStateCreator<EditorStore> = (set, get) => ({
+export const createEditorStore: ImmerStateCreator<EditorStore> = (
+  set,
+  get,
+) => ({
   ...defaultInitState,
   setEditorView: (view: EditorView) => {
     editorViewRef = view;

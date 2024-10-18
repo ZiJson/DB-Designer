@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useState } from "react";
-import { useDraggable, useDndMonitor, DndMonitorListener } from "@dnd-kit/core";
+import { DndMonitorListener, useDndMonitor, useDraggable } from "@dnd-kit/core";
 import { type DragEndEvent } from "@dnd-kit/core";
 import { useWorkspaceStore } from "@/providers/workspace-store-provider";
 import { shallow } from "zustand/shallow";
@@ -38,8 +38,8 @@ function Draggable({
 
   const transformStyle = isTransform &&
     transform && {
-      transform: `translate(${transform.x}px, ${transform.y}px)`,
-    };
+    transform: `translate(${transform.x}px, ${transform.y}px)`,
+  };
 
   return (
     <div

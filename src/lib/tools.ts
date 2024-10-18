@@ -6,10 +6,9 @@ import { DMMF } from "@prisma/generator-helper";
 export const getConnectMode = (p1: Coordinates, p2: Coordinates) => {
   let newP1 = { ...p1 },
     newP2 = { ...p2 };
-  const mode =
-    Math.abs(p1.x - p2.x) > 200
-      ? CONNECT_MODE.OPPOSITE_SIDE
-      : CONNECT_MODE.SAME_SIDE;
+  const mode = Math.abs(p1.x - p2.x) > 200
+    ? CONNECT_MODE.OPPOSITE_SIDE
+    : CONNECT_MODE.SAME_SIDE;
   if (mode === CONNECT_MODE.OPPOSITE_SIDE) {
     if (p1.x > p2.x) {
       newP1.x = p1.x - 144;
@@ -102,10 +101,12 @@ export function convertDMMFToPrismaSchema(datamodel: {
       if (field.relationName) {
         let relationAttribute = `@relation(`;
         const relFields: string[] = [];
-        if (field.relationFromFields && field.relationFromFields.length > 0)
+        if (field.relationFromFields && field.relationFromFields.length > 0) {
           relFields.push(`fields: [${field.relationFromFields.join(", ")}]`);
-        if (field.relationToFields && field.relationToFields.length > 0)
+        }
+        if (field.relationToFields && field.relationToFields.length > 0) {
           relFields.push(`references: [${field.relationToFields.join(", ")}]`);
+        }
         if (relFields.length > 0) {
           relationAttribute += `${relFields.join(", ")}`;
           relationAttribute += ")";

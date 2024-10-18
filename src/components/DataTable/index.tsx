@@ -66,43 +66,48 @@ function DataTable<TData, TValue>({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <HoverCard key={row.id}>
-                <HoverCardTrigger asChild>
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id} className="py-2">
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                </HoverCardTrigger>
-                <HoverCardPortal>
-                  <HoverCardContent
-                    side="left"
-                    sideOffset={10}
-                    align="start"
-                    hidden={isDragging || isEnum}
-                  >
-                    <FieldInfoCard field={row.original as ModelField} />
-                  </HoverCardContent>
-                </HoverCardPortal>
-              </HoverCard>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
-              </TableCell>
-            </TableRow>
-          )}
+          {table.getRowModel().rows?.length
+            ? (
+              table.getRowModel().rows.map((row) => (
+                <HoverCard key={row.id}>
+                  <HoverCardTrigger asChild>
+                    <TableRow
+                      key={row.id}
+                      data-state={row.getIsSelected() && "selected"}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id} className="py-2">
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  </HoverCardTrigger>
+                  <HoverCardPortal>
+                    <HoverCardContent
+                      side="left"
+                      sideOffset={10}
+                      align="start"
+                      hidden={isDragging || isEnum}
+                    >
+                      <FieldInfoCard field={row.original as ModelField} />
+                    </HoverCardContent>
+                  </HoverCardPortal>
+                </HoverCard>
+              ))
+            )
+            : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  No results.
+                </TableCell>
+              </TableRow>
+            )}
         </TableBody>
       </Table>
     </div>

@@ -57,13 +57,14 @@ const Widget = ({
 
   const getSidePosition = useCallback((): Position | null => {
     if (!containerRef.current || !windowWidth || !windowHeight) return null;
-    if (hide)
+    if (hide) {
       return {
         top: padding,
         left: windowWidth / 2,
         right: windowWidth / 2,
         bottom: windowHeight - padding - 40,
       };
+    }
 
     const top = isExpanded
       ? padding + 30
@@ -140,7 +141,9 @@ const Widget = ({
   return (
     <Draggable
       draggableId={widgetId}
-      className={`fixed rounded-lg ${className} transition-[top,transform,right,left,bottom,opacity] ${hide ? "opacity-0" : "opacity-100"} ${isDragging ? "z-20" : "z-10"}`}
+      className={`fixed rounded-lg ${className} transition-[top,transform,right,left,bottom,opacity] ${
+        hide ? "opacity-0" : "opacity-100"
+      } ${isDragging ? "z-20" : "z-10"}`}
       style={{ ...position }}
       isTransform={false}
       onDragMove={onDragMove}
@@ -158,7 +161,11 @@ const Widget = ({
         {children}
       </Card>
       <Card
-        className={`absolute bottom-0 left-1/2 -z-10 -translate-x-1/2 rounded-b-xl bg-primary/50 text-primary-foreground/70 transition-all duration-200 ${isShowToolbar && !hide ? "h-[calc(100%_+_2rem)] w-[calc(100%_+_1rem)]" : "h-full w-full"}`}
+        className={`absolute bottom-0 left-1/2 -z-10 -translate-x-1/2 rounded-b-xl bg-primary/50 text-primary-foreground/70 transition-all duration-200 ${
+          isShowToolbar && !hide
+            ? "h-[calc(100%_+_2rem)] w-[calc(100%_+_1rem)]"
+            : "h-full w-full"
+        }`}
         onMouseLeave={() => !isDragging && setIsShowToolbar(widgetId, false)}
       >
         <Button
@@ -172,17 +179,19 @@ const Widget = ({
           onClick={() => toggletIsExpanded(widgetId)}
           aria-label="expand"
         >
-          {!isExpanded ? (
-            <Maximize2
-              className="absolute left-1/2 top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2"
-              strokeWidth={3}
-            />
-          ) : (
-            <Minimize2
-              className="absolute left-1/2 top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2"
-              strokeWidth={3}
-            />
-          )}
+          {!isExpanded
+            ? (
+              <Maximize2
+                className="absolute left-1/2 top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2"
+                strokeWidth={3}
+              />
+            )
+            : (
+              <Minimize2
+                className="absolute left-1/2 top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2"
+                strokeWidth={3}
+              />
+            )}
         </Button>
         <Button
           className="absolute right-[0.5rem] top-1 h-6 w-8"

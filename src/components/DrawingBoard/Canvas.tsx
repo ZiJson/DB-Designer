@@ -79,7 +79,9 @@ const Canvas = ({ children }: Props) => {
         <div
           style={{ ...positionStyle }}
           id="canvas"
-          className={`absolute ${isScaling ? "transition-none" : "transition-all"} ${isDragging ? "duration-200 ease-out" : "duration-500"}`}
+          className={`absolute ${
+            isScaling ? "transition-none" : "transition-all"
+          } ${isDragging ? "duration-200 ease-out" : "duration-500"}`}
         >
           {children}
         </div>
