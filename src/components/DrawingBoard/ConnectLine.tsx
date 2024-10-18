@@ -47,7 +47,7 @@ const ConnectLine = ({ p1, p2, mode, title }: Props) => {
           strokeDasharray: mode === CONNECT_MODE.STRAIGHT ? "5,10" : "",
         })}
       </Svg>
-      <Badge
+      {title&&<Badge
         className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-lg text-xs`}
         style={{
           top: positionStyle.top + height / 2,
@@ -58,7 +58,7 @@ const ConnectLine = ({ p1, p2, mode, title }: Props) => {
         }}
       >
         {title}
-      </Badge>
+      </Badge>}
     </>
   );
 };

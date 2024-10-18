@@ -21,7 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import FieldInfoCard from "@/components/TableModal/FieldInfoCard";
+import FieldInfoCard from "@/components/TableModel/FieldInfoCard";
 import { ModelField } from "@/types/Database";
 import { useDraggable } from "@dnd-kit/core";
 import { Portal as HoverCardPortal } from "@radix-ui/react-hover-card";
@@ -31,9 +31,10 @@ interface DataTableProps<TData, TValue>
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   title: string;
+  isEnum?: boolean;
 }
-
 function DataTable<TData, TValue>({
+  isEnum = false,
   columns,
   data,
   title,
@@ -88,7 +89,7 @@ function DataTable<TData, TValue>({
                     side="left"
                     sideOffset={10}
                     align="start"
-                    hidden={isDragging}
+                    hidden={isDragging || isEnum}
                   >
                     <FieldInfoCard field={row.original as ModelField} />
                   </HoverCardContent>

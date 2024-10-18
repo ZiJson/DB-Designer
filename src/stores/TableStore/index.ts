@@ -9,15 +9,17 @@ export type MutableDeep<T> = {
 
 type TableState = {
   models: MutableDeep<DMMF.Model>[];
+  enums: MutableDeep<DMMF.DatamodelEnum>[];
   positions: Record<string, Coordinates | null>;
+  datasource:string
 };
 
 type TableActions = {
   updateTablePosition: (tableName: string, position: Coordinates) => void;
-  refreshTables: (models: DMMF.Document["datamodel"]["models"]) => void;
+  refreshTables: (models: DMMF.Datamodel) => void;
   addNewTable: () => void;
   addNewField: (tableName: string) => void;
-  removeTable: (tableName: string) => void;
+  removeModel: (tableName: string) => void;
   removeField: (tableName: string, fieldName: string) => void;
   updateModelName: (tableName: string, name: string) => void;
   updateFieldName: (tableName: string, fieldName: string, name: string) => void;
@@ -26,6 +28,17 @@ type TableActions = {
     fieldName: string,
     field: MutableDeep<DMMF.Field>,
   ) => void;
+  updateEnumName: (tableName: string, name: string) => void;
+  updateEnumValue: (
+    tableName: string,
+    valueName: string,
+    value: string,
+  ) => void;
+  removeEnum: (tableName: string) => void;
+  removeEnumValue: (tableName: string, valueName: string) => void;
+  addNewEnumValue: (tableName: string) => void;
+  addNewEnum: () => void;
+  setDatasource: (datasource:string) => void
 };
 
 export type TableStore = TableState & TableActions;
@@ -263,7 +276,9 @@ const defaultInitState: TableState = {
       isGenerated: false,
     },
   ],
+  enums: [],
   positions: {},
+  datasource:''
 };
 
 const defaultField: MutableDeep<DMMF.Field> = {
@@ -288,12 +303,28 @@ const defaultModel: MutableDeep<DMMF.Model> = {
   isGenerated: false,
 };
 
+const defaultEnumValue: MutableDeep<DMMF.EnumValue> = {
+  name: "Value",
+  dbName: null,
+}
+
+const defaultEnum: MutableDeep<DMMF.DatamodelEnum> = {
+  name: "Enum",
+  dbName: null,
+  values: [defaultEnumValue],
+};
+
 export const createTableStore: ImmerStateCreator<TableStore> = (
   set,
   get,
   store,
 ) => ({
   ...defaultInitState,
+  setDatasource(datasource) {
+    set((state) => {
+      state.datasource = datasource
+    })
+  },
   updateTablePosition(tableName, position) {
     set((state) => {
       state.positions[tableName] = position;
@@ -315,7 +346,7 @@ export const createTableStore: ImmerStateCreator<TableStore> = (
       });
     });
   },
-  removeTable(modelName) {
+  removeModel(modelName) {
     set((state) => {
       state.models = state.models.filter((model) => model.name !== modelName);
       state.positions[modelName] = null;
@@ -337,9 +368,10 @@ export const createTableStore: ImmerStateCreator<TableStore> = (
       });
     });
   },
-  refreshTables(models) {
+  refreshTables({ models, enums }) {
     set((state) => {
       state.models = models as MutableDeep<DMMF.Model>[];
+      state.enums = enums as MutableDeep<DMMF.DatamodelEnum>[];
     });
   },
   updateModelName(tableName, name) {
@@ -421,6 +453,97 @@ export const createTableStore: ImmerStateCreator<TableStore> = (
         }
         return model;
       });
+    });
+  },
+  updateEnumName(tableName, name) {
+    set((state) => {
+      state.enums = state.enums.map((enumData) => {
+        if (enumData.name === tableName) {
+          enumData.name = name;
+        }
+        return enumData;
+      });
+      state.models = state.models.map((model) => {
+        model.fields = model.fields.map((field) => {
+          if (field.type === tableName && field.kind === "enum") {
+            field.type = name;
+          }
+          return field; 
+        })
+        return model
+      })
+      const tempPosition = get().positions[tableName]!;
+      state.positions[name] = tempPosition;
+      state.positions[tableName] = null;
+    });
+  },
+  updateEnumValue(tableName, name, value) {
+    set((state) => {
+      state.enums = state.enums.map((enumData) => {
+        if (enumData.name === tableName) {
+          enumData.values = enumData.values.map((val) => {
+            if (val.name === name) {
+              val.name = value;
+            }
+            return val;
+          })
+        }
+        return enumData;
+      });
+      state.models = state.models.map((model) => {
+        model.fields = model.fields.map((field) => {
+          if (field.type === tableName && field.kind === "enum" && field.default === name) {
+            field.default = value;
+          }
+          return field; 
+        })
+        return model
+      })
+    });
+  },
+  removeEnum(tableName) {
+    set((state) => {
+      state.enums = state.enums.filter((enumData) => enumData.name !== tableName);
+      state.models = state.models.map((model) => {
+        model.fields = model.fields.filter((field) => !(field.kind === "enum" && field.type === tableName));
+        return model
+      })
+    });
+  },
+  removeEnumValue(tableName, valueName) {
+    set((state) => {
+      state.enums = state.enums.map((enumData) => {
+        if (enumData.name === tableName) {
+          enumData.values = enumData.values.filter((val) => val.name !== valueName);
+        }
+        return enumData;
+      });
+      state.models = state.models.map((model) => {
+        model.fields = model.fields.map((field) => {
+          if (field.type === tableName && field.kind === "enum" && field.default === valueName) {
+            field.default = '';
+            field.hasDefaultValue = false;
+          }
+          return field; 
+        })
+        return model
+      })
+    }
+    )
+  },
+  addNewEnumValue(tableName) {
+    set((state) => {
+      state.enums = state.enums.map((enumData) => {
+        if (enumData.name === tableName) {
+          enumData.values.push(defaultEnumValue);
+        }
+        return enumData;
+      });
+    });
+  },
+  addNewEnum() {
+    set((state) => {
+      state.enums.push(defaultEnum);
     });
   },
 });

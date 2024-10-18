@@ -8,18 +8,18 @@ import { DMMF } from "@prisma/generator-helper";
 import { useWorkspaceStore } from "@/providers/workspace-store-provider";
 import { useTheme } from "next-themes";
 import { convertDMMFToPrismaSchema } from "@/lib/tools";
-import { RefAttributes } from "react";
 
 const CodeEditor = (props: ReactCodeMirrorProps) => {
   const schema = useWorkspaceStore((state) =>
-    convertDMMFToPrismaSchema({ models: state.models }),
+    state.datasource+convertDMMFToPrismaSchema({ models: state.models, enums: state.enums }),
   );
 
   const { theme, systemTheme } = useTheme();
   const refreshTables = useWorkspaceStore((state) => state.refreshTables);
   const updateErrors = useWorkspaceStore((state) => state.updateErrors);
+  const setDatasource = useWorkspaceStore((state) => state.setDatasource);
   const onSuccess = (dmmf: DMMF.Document) => {
-    refreshTables(dmmf.datamodel.models);
+    refreshTables(dmmf.datamodel);
   };
   return (
     <CodeMirror
@@ -28,7 +28,7 @@ const CodeEditor = (props: ReactCodeMirrorProps) => {
       theme={theme === "system" ? systemTheme : (theme as "light" | "dark")}
       extensions={[
         prismaLang,
-        linter(prismaLinter(onSuccess, updateErrors)),
+        linter(prismaLinter(onSuccess, updateErrors, setDatasource)),
         lintGutter({}),
         autocompletion({ override: [prismaCompletion] }),
       ]}

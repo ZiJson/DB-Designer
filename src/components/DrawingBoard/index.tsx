@@ -1,10 +1,11 @@
 "use client";
 import Canvas from "./Canvas";
 import { useWorkspaceStore } from "@/providers/workspace-store-provider";
-import TableModal from "../TableModal";
+import TableModal from "../TableModel";
 import ConnectLine, { CONNECT_MODE } from "./ConnectLine";
 import { DndContext, MouseSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { useEffect, useState } from "react";
+import EnumModel from "../EnumModel";
 
 const DrawingBoard = () => {
   return (
@@ -19,10 +20,14 @@ export default DrawingBoard;
 
 const Models = () => {
   const models = useWorkspaceStore((state) => state.models);
+  const enums = useWorkspaceStore((state) => state.enums);
   return (
     <>
       {models.map((model) => (
         <TableModal key={model.name} tableData={model} />
+      ))}
+      {enums.map((enumData) => (
+        <EnumModel key={enumData.name} enumData={enumData} />
       ))}
     </>
   );
@@ -30,6 +35,7 @@ const Models = () => {
 
 const Lines = () => {
   const models = useWorkspaceStore((state) => state.models);
+  const enums = useWorkspaceStore((state) => state.enums);
   const positions = useWorkspaceStore((state) => state.positions);
   const [rerender, setRerender] = useState(false);
 
@@ -47,13 +53,11 @@ const Lines = () => {
       typeof document !== "undefined"
         ? document.getElementById(tableName)
         : null;
-    const model = models.find((model) => model.name === tableName)!;
-    const fieldIndex = model.fields.findIndex(
-      (field) => field.name === fieldName,
-    );
+    const table = [...models, ...enums].find((model) => model.name === tableName)!;
+    const rowIndex = 'fields' in table ? table.fields.findIndex((field) => field.name === fieldName):table.values.findIndex((value) => value.name === fieldName);
     return {
       x: position.x,
-      y: position.y + 18.5 + (fieldIndex < 0 ? 0 : (fieldIndex + 1) * 37),
+      y: position.y + 18.5 + (rowIndex < 0 ? 0 : (rowIndex + 1) * 37),
       width: ModelElement?.offsetWidth || 140,
     };
   };
@@ -61,13 +65,13 @@ const Lines = () => {
   const relations = models.flatMap((model) =>
     model.fields
       .filter(
-        (field) => field.kind === "object" && !field.relationFromFields?.length,
+        (field) => (field.kind === "object" && !field.relationFromFields?.length)||field.kind === "enum",
       )
       .map((field) => {
         return {
           from: [field.type],
           to: [model.name, field.name],
-          name: field.relationName,
+          name: field.kind === "enum" ? '' : field.relationName,
         };
       }),
   );

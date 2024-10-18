@@ -9,7 +9,7 @@ type CanvasState = {
 type CanvasActions = {
   setScale: (scale: number) => void;
   setCanvasPosition: (position: Coordinates) => void;
-  resizeCanvas: (modelName?: string) => void;
+  resizeCanvas: (tableName?: string) => void;
 };
 
 export type CanvasStore = CanvasState & CanvasActions;
@@ -32,9 +32,9 @@ export const createCanvasStore: ImmerStateCreator<CanvasStore> = (
     set((state) => {
       state.position = position;
     }),
-  resizeCanvas: (modelName?: string) => {
+  resizeCanvas: (tableName?: string) => {
     set((state) => {
-      const { positions, scale: canvasScale, models } = get();
+      const { positions, scale: canvasScale, models,enums } = get();
 
       if (typeof document === "undefined") return;
 
@@ -44,8 +44,8 @@ export const createCanvasStore: ImmerStateCreator<CanvasStore> = (
       const relevantPositions: Coordinates[] = Object.entries(positions)
         .filter(
           ([key, coor]) =>
-            models.some((model) => model.name === key) &&
-            (key === modelName || !modelName) &&
+            [...models,...enums].some((table) => table.name === key) &&
+            (key === tableName || !tableName) &&
             coor,
         )
         .map(([key, coor]) => {

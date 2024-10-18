@@ -60,9 +60,10 @@ export const insertAt = <T>(array: T[], index: number, item: T): T[] => {
 
 export function convertDMMFToPrismaSchema(datamodel: {
   models: MutableDeep<DMMF.Model[]>;
+  enums: MutableDeep<DMMF.DatamodelEnum[]>;
 }): string {
   let schema = "";
-  const models = datamodel.models;
+  const { models, enums } = datamodel;
 
   for (const model of models) {
     schema += `model ${model.name}`;
@@ -93,7 +94,7 @@ export function convertDMMFToPrismaSchema(datamodel: {
         const defaultValue =
           typeof field.default === "object" && field.default !== null
             ? `${(field.default as { name: string }).name}()` // TODO: default type handling
-            : JSON.stringify(field.default);
+            : field.default;
         attributes.push(`@default(${defaultValue})`);
       }
 
@@ -136,6 +137,14 @@ export function convertDMMFToPrismaSchema(datamodel: {
       }
     }
 
+    schema += "}\n\n";
+  }
+
+  for (const enumDef of enums) {
+    schema += `enum ${enumDef.name} {\n`;
+    for (const value of enumDef.values) {
+      schema += `\t${value.name}\n`;
+    }
     schema += "}\n\n";
   }
   return schema.trim();

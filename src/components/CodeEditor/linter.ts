@@ -18,10 +18,13 @@ export const prismaLinter =
   (
     callback: (dmmf: DMMF.Document) => void,
     onError: (error: string[]) => void,
+    setDatasource: (datasource:string) => void
   ) =>
   async (view: EditorView) => {
     const diagnostics: Diagnostic[] = [];
     const text = view.state.doc.toString();
+    const datasource = text.split('model')[0]
+    setDatasource(datasource)
     const addDiagnostic = (result: CustomLintResult) => {
       diagnostics.push({
         from: result.from,
@@ -101,3 +104,4 @@ function getLineIndices(text: string, lineNumber: number) {
 
   return { from: fromIndex, to: toIndex };
 }
+
