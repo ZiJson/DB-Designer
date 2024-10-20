@@ -1,8 +1,7 @@
 import { schemaToDmmf } from "@/actions/dmmf";
-import { Diagnostic, linter, lintGutter } from "@codemirror/lint";
-import { EditorView } from "@codemirror/view";
+import { Diagnostic } from "@codemirror/lint";
 import { DMMF } from "@prisma/generator-helper";
-import { on } from "events";
+import { EditorView } from "@uiw/react-codemirror";
 import { toast } from "sonner";
 
 // Define a type for our custom lint result

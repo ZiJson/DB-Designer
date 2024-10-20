@@ -4,6 +4,10 @@ const nextConfig = {
     if (isServer) {
       config.externals.push("_http_common");
     }
+    config.module.rules.push({
+      test: /\.svg$/,
+      use: ["@svgr/webpack"],
+    });
     return config;
   },
   experimental: {

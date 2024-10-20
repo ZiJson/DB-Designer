@@ -60,7 +60,7 @@ const CodeEditor = (props: ReactCodeMirrorProps) => {
 
 export default CodeEditor;
 
-const prismaLang = StreamLanguage.define({
+export const prismaLang = StreamLanguage.define({
   token: (stream) => {
     if (stream.match(/model|datasource|generator|enum/)) return "keyword";
     if (stream.match(/@id|@default|@unique|@relation/)) return "attribute";

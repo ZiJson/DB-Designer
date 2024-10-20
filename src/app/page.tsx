@@ -1,33 +1,21 @@
-"use client";
-import DrawingBoard from "@/components/DrawingBoard";
-import CodeEditor from "@/components/CodeEditor";
-import Widget from "@/components/WidgetContainer/Widget";
-import { DndContext, MouseSensor, useSensor, useSensors } from "@dnd-kit/core";
-import WidgetContainer from "@/components/WidgetContainer";
-import NoCodeEditor from "@/components/NoCodeEditor";
+import { Features, Navigation, PreviewImg, Title } from "./components";
+import Link from "next/link";
+import { RainbowButton } from "@/components/ui/rainbow-button";
 
 const Page = () => {
-  const sensors = useSensors(
-    useSensor(MouseSensor, {
-      activationConstraint: { delay: 100, tolerance: 1000, distance: 10 },
-    }),
-  );
   return (
-    <DndContext sensors={sensors}>
-      <div className="relative flex h-full w-full">
-        <DrawingBoard />
-        <WidgetContainer>
-          <Widget widgetId="codeEditor">
-            <CodeEditor />
-          </Widget>
-          <Widget widgetId="noCodeEditor">
-            <NoCodeEditor />
-          </Widget>
-        </WidgetContainer>
-        <div className="absolute bottom-5 right-[50%] flex translate-x-[50%] gap-3">
-        </div>
-      </div>
-    </DndContext>
+    <div className="bg-background py-[10rem] dark:bg-black">
+      <Navigation />
+      <Title.Title />
+      <Title.Subtitle />
+      <Link href="/playground">
+        <RainbowButton className="mx-auto mt-8 block">
+          Get Started
+        </RainbowButton>
+      </Link>
+      <PreviewImg />
+      <Features />
+    </div>
   );
 };
 

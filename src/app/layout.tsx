@@ -5,6 +5,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { WorkspaceStoreProvider } from "@/providers/workspace-store-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { FloatingTools } from "./components";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,7 +29,10 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <WorkspaceStoreProvider>
-            <div className="h-screen w-screen">{children}</div>
+            <div className="h-screen w-screen">
+              <FloatingTools />
+              {children}
+            </div>
           </WorkspaceStoreProvider>
         </ThemeProvider>
         <Toaster />
