@@ -7,7 +7,7 @@ export type MutableDeep<T> = {
   -readonly [P in keyof T]: MutableDeep<T[P]>;
 };
 
-type TableState = {
+export type TableState = {
   models: MutableDeep<DMMF.Model>[];
   enums: MutableDeep<DMMF.DatamodelEnum>[];
   positions: Record<string, Coordinates | null>;
@@ -39,243 +39,13 @@ type TableActions = {
   addNewEnumValue: (tableName: string) => void;
   addNewEnum: () => void;
   setDatasource: (datasource: string) => void;
+  startTemplate: (template: Omit<TableState, "datasource">) => void;
 };
 
 export type TableStore = TableState & TableActions;
 
 const defaultInitState: TableState = {
-  models: [
-    {
-      name: "Profile",
-      dbName: null,
-      fields: [
-        {
-          name: "id",
-          kind: "scalar",
-          isList: false,
-          isRequired: true,
-          isUnique: false,
-          isId: true,
-          isReadOnly: false,
-          hasDefaultValue: true,
-          type: "Int",
-          default: {
-            name: "autoincrement",
-            args: [],
-          },
-          isGenerated: false,
-          isUpdatedAt: false,
-        },
-        {
-          name: "user",
-          kind: "object",
-          isList: false,
-          isRequired: true,
-          isUnique: false,
-          isId: false,
-          isReadOnly: false,
-          hasDefaultValue: false,
-          type: "User",
-          relationName: "ProfileToUser",
-          relationFromFields: ["userId"],
-          relationToFields: ["id"],
-          isGenerated: false,
-          isUpdatedAt: false,
-        },
-        {
-          name: "userId",
-          kind: "scalar",
-          isList: false,
-          isRequired: true,
-          isUnique: true,
-          isId: false,
-          isReadOnly: true,
-          hasDefaultValue: false,
-          type: "Int",
-          isGenerated: false,
-          isUpdatedAt: false,
-        },
-      ],
-      primaryKey: null,
-      uniqueFields: [],
-      uniqueIndexes: [],
-      isGenerated: false,
-    },
-    {
-      name: "User",
-      dbName: null,
-      fields: [
-        {
-          name: "id",
-          kind: "scalar",
-          isList: false,
-          isRequired: true,
-          isUnique: false,
-          isId: true,
-          isReadOnly: false,
-          hasDefaultValue: true,
-          type: "Int",
-          default: {
-            name: "autoincrement",
-            args: [],
-          },
-          isGenerated: false,
-          isUpdatedAt: false,
-        },
-        {
-          name: "posts",
-          kind: "object",
-          isList: true,
-          isRequired: true,
-          isUnique: false,
-          isId: false,
-          isReadOnly: false,
-          hasDefaultValue: false,
-          type: "Post",
-          relationName: "PostToUser",
-          relationFromFields: [],
-          relationToFields: [],
-          isGenerated: false,
-          isUpdatedAt: false,
-        },
-        {
-          name: "profile",
-          kind: "object",
-          isList: false,
-          isRequired: false,
-          isUnique: false,
-          isId: false,
-          isReadOnly: false,
-          hasDefaultValue: false,
-          type: "Profile",
-          relationName: "ProfileToUser",
-          relationFromFields: [],
-          relationToFields: [],
-          isGenerated: false,
-          isUpdatedAt: false,
-        },
-      ],
-      primaryKey: null,
-      uniqueFields: [],
-      uniqueIndexes: [],
-      isGenerated: false,
-    },
-    {
-      name: "Post",
-      dbName: null,
-      fields: [
-        {
-          name: "id",
-          kind: "scalar",
-          isList: false,
-          isRequired: true,
-          isUnique: false,
-          isId: true,
-          isReadOnly: false,
-          hasDefaultValue: true,
-          type: "Int",
-          default: {
-            name: "autoincrement",
-            args: [],
-          },
-          isGenerated: false,
-          isUpdatedAt: false,
-        },
-        {
-          name: "author",
-          kind: "object",
-          isList: false,
-          isRequired: true,
-          isUnique: false,
-          isId: false,
-          isReadOnly: false,
-          hasDefaultValue: false,
-          type: "User",
-          relationName: "PostToUser",
-          relationFromFields: ["authorId"],
-          relationToFields: ["id"],
-          isGenerated: false,
-          isUpdatedAt: false,
-        },
-        {
-          name: "authorId",
-          kind: "scalar",
-          isList: false,
-          isRequired: true,
-          isUnique: false,
-          isId: false,
-          isReadOnly: true,
-          hasDefaultValue: false,
-          type: "Int",
-          isGenerated: false,
-          isUpdatedAt: false,
-        },
-        {
-          name: "categories",
-          kind: "object",
-          isList: true,
-          isRequired: true,
-          isUnique: false,
-          isId: false,
-          isReadOnly: false,
-          hasDefaultValue: false,
-          type: "Category",
-          relationName: "CategoryToPost",
-          relationFromFields: [],
-          relationToFields: [],
-          isGenerated: false,
-          isUpdatedAt: false,
-        },
-      ],
-      primaryKey: null,
-      uniqueFields: [],
-      uniqueIndexes: [],
-      isGenerated: false,
-    },
-    {
-      name: "Category",
-      dbName: null,
-      fields: [
-        {
-          name: "id",
-          kind: "scalar",
-          isList: false,
-          isRequired: true,
-          isUnique: false,
-          isId: true,
-          isReadOnly: false,
-          hasDefaultValue: true,
-          type: "Int",
-          default: {
-            name: "autoincrement",
-            args: [],
-          },
-          isGenerated: false,
-          isUpdatedAt: false,
-        },
-        {
-          name: "posts",
-          kind: "object",
-          isList: true,
-          isRequired: true,
-          isUnique: false,
-          isId: false,
-          isReadOnly: false,
-          hasDefaultValue: false,
-          type: "Post",
-          relationName: "CategoryToPost",
-          relationFromFields: [],
-          relationToFields: [],
-          isGenerated: false,
-          isUpdatedAt: false,
-        },
-      ],
-      primaryKey: null,
-      uniqueFields: [],
-      uniqueIndexes: [],
-      isGenerated: false,
-    },
-  ],
+  models: [],
   enums: [],
   positions: {},
   datasource: "",
@@ -493,7 +263,8 @@ export const createTableStore: ImmerStateCreator<TableStore> = (
       state.models = state.models.map((model) => {
         model.fields = model.fields.map((field) => {
           if (
-            field.type === tableName && field.kind === "enum" &&
+            field.type === tableName &&
+            field.kind === "enum" &&
             field.default === name
           ) {
             field.default = value;
@@ -506,12 +277,12 @@ export const createTableStore: ImmerStateCreator<TableStore> = (
   },
   removeEnum(tableName) {
     set((state) => {
-      state.enums = state.enums.filter((enumData) =>
-        enumData.name !== tableName
+      state.enums = state.enums.filter(
+        (enumData) => enumData.name !== tableName,
       );
       state.models = state.models.map((model) => {
-        model.fields = model.fields.filter((field) =>
-          !(field.kind === "enum" && field.type === tableName)
+        model.fields = model.fields.filter(
+          (field) => !(field.kind === "enum" && field.type === tableName),
         );
         return model;
       });
@@ -521,8 +292,8 @@ export const createTableStore: ImmerStateCreator<TableStore> = (
     set((state) => {
       state.enums = state.enums.map((enumData) => {
         if (enumData.name === tableName) {
-          enumData.values = enumData.values.filter((val) =>
-            val.name !== valueName
+          enumData.values = enumData.values.filter(
+            (val) => val.name !== valueName,
           );
         }
         return enumData;
@@ -530,7 +301,8 @@ export const createTableStore: ImmerStateCreator<TableStore> = (
       state.models = state.models.map((model) => {
         model.fields = model.fields.map((field) => {
           if (
-            field.type === tableName && field.kind === "enum" &&
+            field.type === tableName &&
+            field.kind === "enum" &&
             field.default === valueName
           ) {
             field.default = "";
@@ -556,5 +328,16 @@ export const createTableStore: ImmerStateCreator<TableStore> = (
     set((state) => {
       state.enums.push(defaultEnum);
     });
+  },
+  startTemplate(template) {
+    set((state) => {
+      const { models, enums, positions } = template;
+      state.models = models;
+      state.enums = enums;
+      state.positions = positions;
+    });
+    setTimeout(() => {
+      get().resizeCanvas();
+    }, 0);
   },
 });

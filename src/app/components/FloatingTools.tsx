@@ -1,11 +1,16 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Github, MoonIcon, SunIcon } from "lucide-react";
+import { Github, Home, MoonIcon, SunIcon } from "lucide-react";
 import { useTheme } from "next-themes";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const FloatingTools = () => {
+  const pathname = usePathname();
+  const isHome = pathname === "/";
   return (
-    <div className="fixed right-4 top-4 z-50">
+    <div className="fixed right-8 top-5 z-50 flex gap-1">
+      {!isHome && <HomeButton />}
       <ThemeButton />
       <GithubButton />
     </div>
@@ -30,8 +35,20 @@ const ThemeButton = () => {
 
 const GithubButton = () => {
   return (
-    <Button variant="ghost" size="icon">
-      <Github className="h-[1.2rem] w-[1.2rem]" />
-    </Button>
+    <Link href="https://github.com/ZiJson/DB-Designer" target="_blank">
+      <Button variant="ghost" size="icon">
+        <Github className="h-[1.2rem] w-[1.2rem]" />
+      </Button>
+    </Link>
+  );
+};
+
+const HomeButton = () => {
+  return (
+    <Link href="/">
+      <Button variant="ghost" size="icon">
+        <Home className="h-[1.2rem] w-[1.2rem]" />
+      </Button>
+    </Link>
   );
 };

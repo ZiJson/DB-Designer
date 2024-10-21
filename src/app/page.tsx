@@ -1,20 +1,22 @@
-import { Features, Navigation, PreviewImg, Title } from "./components";
-import Link from "next/link";
-import { RainbowButton } from "@/components/ui/rainbow-button";
+import {
+  Features,
+  Footer,
+  GetStartBtn,
+  Logo,
+  PreviewImg,
+  Title,
+} from "./components";
 
 const Page = () => {
   return (
-    <div className="bg-background py-[10rem] dark:bg-black">
-      <Navigation />
+    <div className="bg-background p-5 py-[10rem] pb-0 dark:bg-black">
+      <Logo />
       <Title.Title />
       <Title.Subtitle />
-      <Link href="/playground">
-        <RainbowButton className="mx-auto mt-8 block">
-          Get Started
-        </RainbowButton>
-      </Link>
+      <GetStartBtn />
       <PreviewImg />
       <Features />
+      <Footer />
     </div>
   );
 };

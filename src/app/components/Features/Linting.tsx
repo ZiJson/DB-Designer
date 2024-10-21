@@ -33,7 +33,7 @@ const Linting = () => {
 
   return (
     <div
-      className="flex-col/3 absolute left-[50%] top-1/3 flex w-[60%] max-w-[500px] -translate-x-1/2 -translate-y-1/2 scale-110 items-center justify-center rounded-lg bg-transparent p-10 opacity-50 transition-all duration-500 group-hover:left-[60%] group-hover:scale-100 group-hover:opacity-100 md:shadow-xl"
+      className="flex-col/3 absolute left-[50%] top-1/3 flex w-[60%] max-w-[500px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-lg bg-transparent p-10 opacity-50 transition-all duration-500 group-hover:left-[60%] group-hover:opacity-100"
       ref={containerRef}
     >
       <div className="relative flex size-full flex-row justify-between text-primary">

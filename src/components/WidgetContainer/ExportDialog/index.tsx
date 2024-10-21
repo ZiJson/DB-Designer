@@ -4,7 +4,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -12,17 +11,15 @@ import {
 import { convertDMMFToPrismaSchema } from "@/lib/tools";
 import { useWorkspaceStore } from "@/providers/workspace-store-provider";
 import { Copy, Download } from "lucide-react";
-import { useTheme } from "next-themes";
 import CodeEditor from "@/components/CodeEditor";
 import { Card } from "@/components/ui/card";
 
 const ExportDialog = () => {
-  const { theme, systemTheme } = useTheme();
   const errors = useWorkspaceStore((state) => state.errors);
   const schema = useWorkspaceStore((state) =>
-    convertDMMFToPrismaSchema({ models: state.models, enums: state.enums })
+    convertDMMFToPrismaSchema({ models: state.models, enums: state.enums }),
   );
-
+  console.log(schema);
   const handleCopy = () => {
     navigator.clipboard.writeText(schema);
     toast.success("copied to clipboard");
@@ -36,7 +33,7 @@ const ExportDialog = () => {
       )}
       <Dialog>
         <DialogTrigger asChild disabled={!!errors.length}>
-          <Button variant="outline" size="icon" aria-label="Export">
+          <Button variant="dock" size="dock" aria-label="Export">
             <Download className="h-[1.2rem] w-[1.2rem]" />
           </Button>
         </DialogTrigger>
@@ -51,6 +48,7 @@ const ExportDialog = () => {
             <CodeEditor
               readOnly
               basicSetup={{ foldGutter: false, lineNumbers: false }}
+              value={schema}
             />
             <Button
               variant="outline"

@@ -1,5 +1,5 @@
 const Title = () => (
-  <div className="mx-auto max-w-screen-lg text-center text-4xl font-bold text-primary md:text-6xl">
+  <div className="mx-auto max-w-screen-lg text-center text-4xl font-bold text-primary md:text-6xl md:leading-tight">
     Complex to Simple:
     <br />
     Build
@@ -11,7 +11,7 @@ const Title = () => (
 );
 
 const Subtitle = () => (
-  <div className="mx-auto mt-8 max-w-screen-md text-center text-xl font-medium text-muted-foreground">
+  <div className="mx-auto mt-6 max-w-screen-md text-center text-xl font-medium text-muted-foreground">
     Build Prisma schemas your way drag-and-drop for simplicity or dive into code
     when needed. A flexible, intuitive tool for every developer.
   </div>

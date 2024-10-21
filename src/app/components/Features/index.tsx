@@ -34,25 +34,29 @@ const features = [
         )}
       />
     ),
+    delay: 0.3,
   },
   {
     name: "Flexible Workspace",
     description:
-      "Operate without worrying about screen space—adjustable tool windows allow smooth schema editing without interfering with your canvas size.",
+      "Adjustable tool windows allow smooth schema editing without interfering with your canvas.",
     href: "#",
     cta: "Learn more",
     className:
       "col-span-3 lg:col-start-2 lg:col-end-3 lg:row-start-1 lg:row-end-4",
     background: <WidgetDemo />,
+    delay: 0.25,
   },
   {
     name: "Code Editor",
-    description: "Supports 100+ integrations and counting.",
+    description:
+      "With auto-completion and syntax highlighting, take it easy to write code.",
     href: "#",
     cta: "Learn more",
     className:
       "col-span-3 lg:col-start-3 lg:col-end-4 lg:row-start-1 lg:row-end-2",
     background: <Code />,
+    delay: 0.35,
   },
   {
     name: "Undo & Redo",
@@ -63,16 +67,18 @@ const features = [
     href: "#",
     cta: "Learn more",
     background: <UndoRedo />,
+    delay: 0.45,
   },
   {
     name: "Code Free",
     description:
-      "Rely on official Prisma lint checks for safety, with detailed error messages guiding you through corrections.",
+      "Create schemas effortlessly with intuitive folder struct. tool, perfect for users who prefer a visual and code-free approach",
     href: "#",
     cta: "Learn more",
     className:
       "col-span-3 lg:col-start-3 lg:col-end-4 lg:row-start-2 lg:row-end-4",
     background: <NoCode />,
+    delay: 0.5,
   },
   {
     name: "Built-in Linting",
@@ -82,6 +88,7 @@ const features = [
     href: "#",
     cta: "Learn more",
     background: <Linting />,
+    delay: 0.6,
   },
   {
     name: "Several Templates",
@@ -97,16 +104,25 @@ const features = [
         className="font-display mt-4 text-center text-4xl font-bold tracking-[-0.02em] text-black opacity-50 drop-shadow-sm transition-all group-hover:opacity-75 dark:text-white md:text-6xl md:leading-[4rem]"
       />
     ),
+    delay: 0.7,
   },
 ];
 
 const Features = () => {
   return (
-    <BentoGrid className="mx-auto mt-36 max-w-6xl auto-rows-[10rem]">
-      {features.map((feature, idx) => (
-        <BentoCard key={idx} {...feature} />
-      ))}
-    </BentoGrid>
+    <div className="mt-36">
+      <h2 className="my-2 text-center text-3xl font-bold text-primary dark:text-white">
+        Ideal Visualization
+      </h2>
+      <p className="text-center text-lg text-muted-foreground">
+        built for those who being tired of writing complex schemas
+      </p>
+      <BentoGrid className="mx-auto mt-12 max-w-6xl auto-rows-[10rem]">
+        {features.map((feature, idx) => (
+          <BentoCard key={idx} {...feature} />
+        ))}
+      </BentoGrid>
+    </div>
   );
 };
 

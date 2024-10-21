@@ -10,7 +10,7 @@ import { FloatingTools } from "./components";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Prisma Schema Generator",
+  title: "Prismatrix",
   description: "generate prisma schema easily",
 };
 

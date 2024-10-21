@@ -74,8 +74,8 @@ const NoCodeEditor = () => {
     setActiveValue(value);
     resizeCanvas(value);
     !value && setEditingIndex(null);
-    const index = [...models, ...enums].findIndex((model) =>
-      model.name === value
+    const index = [...models, ...enums].findIndex(
+      (model) => model.name === value,
     );
     index !== editingIndex && setEditingIndex(null);
   };
@@ -88,7 +88,7 @@ const NoCodeEditor = () => {
         onValueChange={onValueChange}
         value={activeValue}
       >
-        <div className="w-full py-3">Models</div>
+        <div className="w-full py-3 font-bold">Models</div>
         {models.map((model, modelIndex) => (
           <AccordionItem
             key={modelIndex}
@@ -99,7 +99,8 @@ const NoCodeEditor = () => {
               <ModelSection
                 modelIndex={modelIndex}
                 onEdit={(bool: boolean) =>
-                  setEditingIndex(bool ? modelIndex : null)}
+                  setEditingIndex(bool ? modelIndex : null)
+                }
                 isEditing={editingIndex === modelIndex}
                 onExpand={(bool: boolean) => {
                   setActiveValue(bool ? modelIndex.toString() : "");
@@ -135,7 +136,7 @@ const NoCodeEditor = () => {
         >
           Add Table
         </Button>
-        <div className="w-full pb-3 pt-4">Enums</div>
+        <div className="w-full pb-3 pt-4 font-bold">Enums</div>
 
         {enums.map((enumData, enumIndex) => (
           <AccordionItem
@@ -147,7 +148,8 @@ const NoCodeEditor = () => {
               <EnumSection
                 enumIndex={enumIndex}
                 onEdit={(bool: boolean) =>
-                  setEditingIndex(bool ? enumIndex + models.length : null)}
+                  setEditingIndex(bool ? enumIndex + models.length : null)
+                }
                 isEditing={editingIndex === enumIndex + models.length}
                 onExpand={(bool: boolean) => {
                   setActiveValue(

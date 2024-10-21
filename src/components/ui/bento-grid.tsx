@@ -3,6 +3,7 @@ import { ArrowRightIcon } from "@radix-ui/react-icons";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import BlurFade from "./blur-fade";
 
 const BentoGrid = ({
   children,
@@ -31,6 +32,7 @@ const BentoCard = ({
   description,
   href,
   cta,
+  delay = 0.25,
 }: {
   name: string;
   className: string;
@@ -39,8 +41,9 @@ const BentoCard = ({
   description: string;
   href: string;
   cta: string;
+  delay?: number;
 }) => (
-  <div
+  <BlurFade
     key={name}
     className={cn(
       "group relative col-span-3 flex flex-col justify-between overflow-hidden rounded-xl",
@@ -50,6 +53,8 @@ const BentoCard = ({
       "transform-gpu dark:bg-[#0f0f0f] dark:[border:1px_solid_rgba(255,255,255,.1)] dark:[box-shadow:0_-20px_80px_-20px_#ffffff1f_inset]",
       className,
     )}
+    delay={delay}
+    inView
   >
     <div>{background}</div>
     <div className="pointer-events-none z-10 flex transform-gpu flex-col gap-1 p-6 transition-all duration-300 group-hover:-translate-y-10">
@@ -75,7 +80,7 @@ const BentoCard = ({
       </Button>
     </div>
     <div className="pointer-events-none absolute inset-0 transform-gpu transition-all duration-300 group-hover:bg-black/[.03] group-hover:dark:bg-neutral-800/10" />
-  </div>
+  </BlurFade>
 );
 
 export { BentoCard, BentoGrid };

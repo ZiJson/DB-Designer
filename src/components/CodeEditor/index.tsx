@@ -41,18 +41,20 @@ const CodeEditor = (props: ReactCodeMirrorProps) => {
     <div>
       <CodeMirror
         onCreateEditor={(view: EditorView) => setEditorView(view)}
-        {...props}
         ref={editorRef}
         value={schema}
         theme={theme === "system" ? systemTheme : (theme as "light" | "dark")}
         extensions={[
           prismaLang,
-          linter(
-            prismaLinter(onSuccess, updateErrors, setDatasource, onChange),
-          ),
+          props.readOnly
+            ? []
+            : linter(
+                prismaLinter(onSuccess, updateErrors, setDatasource, onChange),
+              ),
           lintGutter({}),
           autocompletion({ override: [prismaCompletion] }),
         ]}
+        {...props}
       />
     </div>
   );
