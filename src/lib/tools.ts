@@ -6,9 +6,10 @@ import { DMMF } from "@prisma/generator-helper";
 export const getConnectMode = (p1: Coordinates, p2: Coordinates) => {
   let newP1 = { ...p1 },
     newP2 = { ...p2 };
-  const mode = Math.abs(p1.x - p2.x) > 200
-    ? CONNECT_MODE.OPPOSITE_SIDE
-    : CONNECT_MODE.SAME_SIDE;
+  const mode =
+    Math.abs(p1.x - p2.x) > 200
+      ? CONNECT_MODE.OPPOSITE_SIDE
+      : CONNECT_MODE.SAME_SIDE;
   if (mode === CONNECT_MODE.OPPOSITE_SIDE) {
     if (p1.x > p2.x) {
       newP1.x = p1.x - 144;

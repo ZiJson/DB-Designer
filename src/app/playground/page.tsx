@@ -24,8 +24,7 @@ const Page = () => {
             <NoCodeEditor />
           </Widget>
         </WidgetContainer>
-        <div className="absolute bottom-5 right-[50%] flex translate-x-[50%] gap-3">
-        </div>
+        <div className="absolute bottom-5 right-[50%] flex translate-x-[50%] gap-3"></div>
       </div>
     </DndContext>
   );

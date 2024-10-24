@@ -1,6 +1,5 @@
 "use client";
 import { prismaLang } from "@/components/CodeEditor";
-import { Card } from "@/components/ui/card";
 import ReactCodeMirror from "@uiw/react-codemirror";
 import { useTheme } from "next-themes";
 

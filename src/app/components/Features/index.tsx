@@ -1,8 +1,3 @@
-import TextRevealByWord from "@/components/ui/text-reveal";
-import GridCard from "./GridCard";
-import { CalendarIcon, FileTextIcon } from "@radix-ui/react-icons";
-import { BellIcon, Redo, Redo2, Share2Icon, Sparkles } from "lucide-react";
-
 import { BentoCard, BentoGrid } from "@/components/ui/bento-grid";
 import GridPattern from "@/components/ui/animated-grid-pattern";
 import { cn } from "@/lib/utils";

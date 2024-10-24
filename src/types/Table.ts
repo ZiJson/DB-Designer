@@ -10,15 +10,13 @@ export type TableModal = {
   transform: Coordinates;
 };
 
-export type Field =
-  & {
-    id: string;
-    name: string;
-    defaultValue: string | null;
-  }
-  & FiledTypes
-  & FieldToggle
-  & FieldRelation;
+export type Field = {
+  id: string;
+  name: string;
+  defaultValue: string | null;
+} & FiledTypes &
+  FieldToggle &
+  FieldRelation;
 
 export type FieldToggle = {
   [K in ToggleType]: boolean;

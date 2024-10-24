@@ -93,9 +93,8 @@ export const createWidgetStore: ImmerStateCreator<WidgetStore> = (
     );
     set((state) => {
       if (otherWidgetKey) {
-        state.widgets[otherWidgetKey].side = widget.side === "left"
-          ? "right"
-          : "left";
+        state.widgets[otherWidgetKey].side =
+          widget.side === "left" ? "right" : "left";
       }
       state.widgets[widgetId].isShowToolbar = false;
       state.widgets[widgetId].hide = !state.widgets[widgetId].hide;

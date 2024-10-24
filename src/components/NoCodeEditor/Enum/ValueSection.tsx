@@ -18,41 +18,35 @@ const ValueSection = ({
   const enumValue = useWorkspaceStore(
     (state) => state.enums[enumIndex].values[valueIndex],
   );
-  const updateEnumValue = useWorkspaceStore(
-    (state) => state.updateEnumValue,
-  );
-  const removeEnumValue = useWorkspaceStore(
-    (state) => state.removeEnumValue,
-  );
+  const updateEnumValue = useWorkspaceStore((state) => state.updateEnumValue);
+  const removeEnumValue = useWorkspaceStore((state) => state.removeEnumValue);
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newName = e.target.value;
     updateEnumValue(enumName, enumValue.name, newName); // 更新全域狀態
   };
   return (
     <div className="flex h-full w-full items-center justify-between pr-1">
-      {isEditing
-        ? (
-          <>
-            <Input
-              className="h-auto w-20 py-1"
-              value={enumValue.name}
-              onChange={handleNameChange}
-            />
+      {isEditing ? (
+        <>
+          <Input
+            className="h-auto w-20 py-1"
+            value={enumValue.name}
+            onChange={handleNameChange}
+          />
 
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => removeEnumValue(enumName, enumValue.name)}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </>
-        )
-        : (
-          <Badge variant="secondary" className="rounded-md">
-            {enumValue.name}
-          </Badge>
-        )}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => removeEnumValue(enumName, enumValue.name)}
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </>
+      ) : (
+        <Badge variant="secondary" className="rounded-md">
+          {enumValue.name}
+        </Badge>
+      )}
     </div>
   );
 };

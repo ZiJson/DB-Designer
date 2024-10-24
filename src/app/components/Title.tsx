@@ -17,4 +17,9 @@ const Subtitle = () => (
   </div>
 );
 
-export default { Title, Subtitle };
+const components = {
+  Title,
+  Subtitle,
+};
+
+export default components;

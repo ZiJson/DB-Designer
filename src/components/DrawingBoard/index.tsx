@@ -23,7 +23,9 @@ const Models = () => {
   const enums = useWorkspaceStore((state) => state.enums);
   return (
     <>
-      {models.map((model) => <TableModal key={model.name} tableData={model} />)}
+      {models.map((model) => (
+        <TableModal key={model.name} tableData={model} />
+      ))}
       {enums.map((enumData) => (
         <EnumModel key={enumData.name} enumData={enumData} />
       ))}
@@ -47,15 +49,17 @@ const Lines = () => {
 
   const findPositionAndWidth = (tableName: string, fieldName?: string) => {
     const position = positions[tableName] || { x: 0, y: 0 };
-    const ModelElement = typeof document !== "undefined"
-      ? document.getElementById(tableName)
-      : null;
-    const table = [...models, ...enums].find((model) =>
-      model.name === tableName
+    const ModelElement =
+      typeof document !== "undefined"
+        ? document.getElementById(tableName)
+        : null;
+    const table = [...models, ...enums].find(
+      (model) => model.name === tableName,
     )!;
-    const rowIndex = "fields" in table
-      ? table.fields.findIndex((field) => field.name === fieldName)
-      : table.values.findIndex((value) => value.name === fieldName);
+    const rowIndex =
+      "fields" in table
+        ? table.fields.findIndex((field) => field.name === fieldName)
+        : table.values.findIndex((value) => value.name === fieldName);
     return {
       x: position.x,
       y: position.y + 18.5 + (rowIndex < 0 ? 0 : (rowIndex + 1) * 37),
@@ -76,7 +80,7 @@ const Lines = () => {
           to: [model.name, field.name],
           name: field.kind === "enum" ? "" : field.relationName,
         };
-      })
+      }),
   );
 
   return relations.map((relation, index) => {

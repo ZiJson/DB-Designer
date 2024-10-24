@@ -9,9 +9,8 @@ import {
   type WorkspaceStore,
 } from "@/stores/workspace-store";
 
-export const WorkspaceStoreContext = createContext<
-  StoreApi<WorkspaceStore> | null
->(null);
+export const WorkspaceStoreContext =
+  createContext<StoreApi<WorkspaceStore> | null>(null);
 
 export interface WorkspaceStoreProviderProps {
   children: ReactNode;

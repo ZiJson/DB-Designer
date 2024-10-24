@@ -38,8 +38,8 @@ function Draggable({
 
   const transformStyle = isTransform &&
     transform && {
-    transform: `translate(${transform.x}px, ${transform.y}px)`,
-  };
+      transform: `translate(${transform.x}px, ${transform.y}px)`,
+    };
 
   return (
     <div

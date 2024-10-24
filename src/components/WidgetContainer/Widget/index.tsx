@@ -179,19 +179,17 @@ const Widget = ({
           onClick={() => toggletIsExpanded(widgetId)}
           aria-label="expand"
         >
-          {!isExpanded
-            ? (
-              <Maximize2
-                className="absolute left-1/2 top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2"
-                strokeWidth={3}
-              />
-            )
-            : (
-              <Minimize2
-                className="absolute left-1/2 top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2"
-                strokeWidth={3}
-              />
-            )}
+          {!isExpanded ? (
+            <Maximize2
+              className="absolute left-1/2 top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2"
+              strokeWidth={3}
+            />
+          ) : (
+            <Minimize2
+              className="absolute left-1/2 top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2"
+              strokeWidth={3}
+            />
+          )}
         </Button>
         <Button
           className="absolute right-[0.5rem] top-1 h-6 w-8"

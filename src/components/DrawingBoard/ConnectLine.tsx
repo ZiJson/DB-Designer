@@ -29,9 +29,11 @@ const ConnectLine = ({ p1, p2, mode, title }: Props) => {
   return (
     <>
       <Svg
-        width={width +
+        width={
+          width +
           strokeWidth +
-          (mode === CONNECT_MODE.SAME_SIDE ? minLength : 0)}
+          (mode === CONNECT_MODE.SAME_SIDE ? minLength : 0)
+        }
         height={height + strokeWidth}
         viewBox={viewBox}
         className={`absolute -z-10 text-primary/60 drop-shadow-2xl ${
@@ -52,9 +54,10 @@ const ConnectLine = ({ p1, p2, mode, title }: Props) => {
           className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-lg text-xs`}
           style={{
             top: positionStyle.top + height / 2,
-            left: mode === CONNECT_MODE.SAME_SIDE
-              ? positionStyle.left + width + minLength
-              : positionStyle.left + width / 2,
+            left:
+              mode === CONNECT_MODE.SAME_SIDE
+                ? positionStyle.left + width + minLength
+                : positionStyle.left + width / 2,
           }}
         >
           {title}
